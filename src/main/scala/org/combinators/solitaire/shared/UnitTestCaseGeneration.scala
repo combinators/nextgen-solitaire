@@ -90,39 +90,39 @@ trait UnitTestCaseGeneration extends Base with shared.Moves with generic.JavaCod
       for (m <- solitaire.moves) {
         val constraint:Constraint = m.constraints
         val total = max(constraint)
-        val targets = (1 to total).toSeq
+        val targets = (1 to total).toSeq // the range of constraints
         val falsifiedConstrains:Seq[Constraint] = targets.map(idx => perturb(constraint, 0, idx)._1)
 
         falsifiedConstrains.foreach(c => {
           val cc3: Option[Expression] = gen(c)
-          println("CC3:" + cc3.mkString("\n"))
+          println("CC3:" + m.name + "//:"+ cc3.mkString("\n"))
         })
 
         val sym = Constructor(m.name)
         val source_loc = if(m.source._1.name.equalsIgnoreCase("stockcontainer")) "deck" else m.source._1.name + "[0]"
-        val dealDeck_logic = if(m.moveType.getClass.getSimpleName.equalsIgnoreCase("dealdeck")) "game.tableau" else "movingStack, dest"
+        val dealDeck_logic = if(m.moveType.getClass.getSimpleName.equalsIgnoreCase("dealdeck")) "game.tableau" else "movingCards, destination"
         //Additional assertion dependent on if move is dealdeck or not
         val additional_assertion =
           if(m.moveType.getClass.getSimpleName.equalsIgnoreCase("dealdeck"))
           "ss - game.tableau.length, game.deck.count()"
         else
-          "ds + ms, dest.count()"
+          "ds + ms, destination.count()"
 
         val method = Java(
           s"""
              |@Test
              |public void test${m.name} () {
              |String type  = "${m.moveType.getClass.getSimpleName}";
-             |Stack movingStack = getValidStack();
+             |Stack movingCards = getValidStack();
              |
              |game.tableau[0].removeAll();
              |game.tableau[1].removeAll();
              |
              |Stack source = game.${source_loc}; //game.tableau[0] or deck
-             |Stack dest = game.${m.target.head._1.name}[1]; //game.foundation[1] or game.tableau[1]
+             |Stack destination = game.${m.target.head._1.name}[1]; //game.foundation[1] or game.tableau[1]
              |int ss = source.count();
-             |int ds = dest.count();
-             |int ms = movingStack.count();
+             |int ds = destination.count();
+             |int ms = movingCards.count();
              |
              |${m.name} move = new ${m.name}(source, ${dealDeck_logic});
              |
@@ -133,6 +133,33 @@ trait UnitTestCaseGeneration extends Base with shared.Moves with generic.JavaCod
              |}""".stripMargin).methodDeclarations().head
 
         methods = methods :+ method
+
+        var testNum = 0
+        falsifiedConstrains.foreach(c => {
+          val cc3: Option[Expression] = gen(c)
+          val testCase = Java(
+              s"""
+                 |@Test
+                 |public void subtest${m.name + testNum} () {
+                 |String type  = "${m.moveType.getClass.getSimpleName}";
+                 |Stack movingCards = getValidStack();
+                 |
+                 |game.tableau[0].removeAll();
+                 |game.tableau[1].removeAll();
+                 |
+                 |Stack source = game.${source_loc}; //game.tableau[0] or deck
+                 |Stack destination = game.${m.target.head._1.name}[1]; //game.foundation[1] or game.tableau[1]
+                 |int ss = source.count();
+                 |int ds = destination.count();
+                 |int ms = movingCards.count();
+                 |
+                 |${m.name} move = new ${m.name}(source, ${dealDeck_logic});
+                 |Assert.assertTrue(${cc3.mkString("")});
+                 |
+                 |}""".stripMargin).methodDeclarations().head
+          testNum = testNum + 1
+          methods = methods :+ testCase
+        })
       }
 
       val container = Java(s"""|package org.combinators.solitaire.${pkgName.toLowerCase};
@@ -143,6 +170,8 @@ trait UnitTestCaseGeneration extends Base with shared.Moves with generic.JavaCod
                |import org.junit.Assert;
                |import org.junit.Before;
                |import org.junit.Test;
+               |
+               |//Should hold falsified cases
                |public class ${name}TestCases {
                |${name} game;
                |
