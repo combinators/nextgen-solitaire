@@ -6,11 +6,9 @@ import com.github.javaparser.ast.stmt.Statement
 import org.combinators.cls.interpreter.combinator
 import org.combinators.cls.types.Type
 import org.combinators.templating.twirl.Java
-import domain.{Container, ContainerType, Solitaire, Stock}
 import org.combinators.solitaire.shared
 import org.combinators.cls.types.syntax._
-
-import scala.collection.JavaConverters._
+import org.combinators.solitaire.domain._
 
 trait Initialization extends SemanticTypes {
   /**
@@ -83,8 +81,8 @@ trait Initialization extends SemanticTypes {
     * @param contName    Name of container holding these view widgets
     * @return
     */
-  def loopControllerGen(cont: Container, viewName : String, contName:String): Seq[Statement] = {
-    val nc = cont.size()
+  def loopControllerGen(cont: Seq[Element], viewName : String, contName:String): Seq[Statement] = {
+    val nc = cont.size
     val inner = controllerGen(viewName + "[j]", contName)
 
     Java(s"""
@@ -100,20 +98,34 @@ trait Initialization extends SemanticTypes {
     * to iterate over the elements, and the need to compute a unique name (based on the prefix)
     * for each of the j elements.
     *
-    * @param cont        Actual container holding these widgets
+    * @param ct          Actual container holding these widgets
     * @param modelName   The name of the variable name holding the element
+    * @param actual      Actual iterator of Element objects from the domain model
     * @param typ         The name of the Element class
     */
-  def loopConstructGen(cont: Container, modelName: String, typ:String): Seq[Statement] = {
-    val nc = cont.size()
+  def loopConstructGen(ct: ContainerType, modelName: String, actual:Seq[Element], typ:String): Seq[Statement] = {
+    val nc = actual.size
     val viewName = modelName + "View"
+
+    // In nearly EVERY case, the constructor is clean, but it really is up to the individual element.
+    // We should actually unroll the loop and process the iterator fully. Leave for another time
+    val element:Element = actual.head
+
+    // TOTAL HACK: TODO: FIX UP WITH CLEANER INSTANTIATION
+    val constructor:String = element match  {
+      case FanPile(num) => {
+        s"""new ${typ}View($num, $modelName[j])"""
+      }
+
+      case _ => s"""new ${typ}View($modelName[j])"""
+    }
 
     Java(
       s"""
          |for (int j = 0; j < $nc; j++) {
          |  $modelName[j] = new $typ(${modelName}Prefix + (j+1));
          |  addModelElement ($modelName[j]);
-         |  $viewName[j] = new ${typ}View($modelName[j]);
+         |  $viewName[j] = $constructor;
          |}""".stripMargin).statements()
   }
 
@@ -129,26 +141,19 @@ trait Initialization extends SemanticTypes {
   class ProcessFields (sol:Solitaire) {
     def apply: Seq[FieldDeclaration] = {
 
-      var fields = Java(s"""
-                           |IntegerView scoreView;
-                           |IntegerView numLeftView;
-             """.stripMargin).fieldDeclarations()
+      var defaultFields = Java(s"""|IntegerView scoreView;
+                                   |IntegerView numLeftView;
+                                """.stripMargin).fieldDeclarations()
 
-      for (containerType:ContainerType <- sol.containers.keySet.asScala) {
-        val container = sol.containers.get(containerType)
-        container match {
-
-          case d: Stock =>
-            fields = fields ++ deckFieldGen(d)
-
-          case _ =>
-            val tpe: String = container.types().next
-
-            fields = fields ++ processFieldGen(tpe, containerType.getName, container.size())
-        }
+      val fields = sol.structure.flatMap { case (ct, elements) =>
+          ct match {
+            case StockContainer => deckFieldGen(elements)
+            case _ =>  processFieldGen(elements.head.name, ct.name, elements.size)
+          }
       }
 
-      fields
+
+      defaultFields ++ fields
     }
 
     val semanticType: Type = game(game.fields)
@@ -157,23 +162,22 @@ trait Initialization extends SemanticTypes {
   /** Process Solitaire domain model to construct game(game.control). */
   class ProcessControl (sol:Solitaire) {
     def apply: Seq[Statement] = {
-      var stmts: Seq[Statement] = Seq.empty
-      for (containerType:ContainerType <- sol.containers.keySet.asScala) {
-        val container = sol.containers.get(containerType)
-        container match {
+     // var stmts: Seq[Statement] = Seq.empty
 
-          case d: Stock =>
-            if (sol.isVisible(d)) {  //   (!d.isInvisible) {
-              stmts = stmts ++ controllerGen(s"${containerType.getName}View", "DeckController")
-            }
+      sol.structure.flatMap { case (ct, elements) =>
+        ct match {
+        case StockContainer =>
+          if (sol.layout.isVisible(ct)) {
+            controllerGen("deckView", "DeckController")
+          } else {
+            Seq.empty
+          }
 
-          case _ =>
-            val tpe: String = container.types().next
-            stmts = stmts ++ loopControllerGen(container, s"${containerType.getName}View", s"${tpe}Controller")
+        case _ =>
+          val tpe: String = elements.head.name
+          loopControllerGen(elements, s"${ct.name}View", s"${tpe}Controller")
         }
-      }
-
-      stmts
+      }.toSeq
     }
 
     val semanticType: Type = game(game.control)
@@ -181,78 +185,57 @@ trait Initialization extends SemanticTypes {
 
   /** Process Solitaire domain model to construct game(game.view). */
   class ProcessView (sol:Solitaire) {
-    def apply: Seq[Statement] = {
-      var stmts: Seq[Statement] = Seq.empty
-      for (containerType:ContainerType <- sol.containers.keySet.asScala) {
-        val container = sol.containers.get(containerType)
-        val name = containerType.getName
-        container match {
-
-          case d: Stock => {
-            // Need to keep these "redundant braces" to ensure we don't fall through to next case
-            if (sol.isVisible(d)) {
-              stmts = stmts ++ Java(s"""${name}View = new DeckView($name);""").statements()
-              stmts = stmts ++ layout_place_one(sol, d, Java(s"${name}View").name())
-            }
-          }
+    def apply: Seq[Statement] =
+      sol.structure.flatMap { case (ct, elements) =>
+        ct match {
+          case StockContainer =>
+            if (sol.layout.isVisible(ct)) {
+              Java(s"""deckView = new DeckView(deck);""").statements() ++
+                layout_place_one(sol, ct, Java("deckView").name())
+            } else Seq.empty
 
           case _ =>
-            stmts = stmts ++ layout_place_it(sol, container, Java(s"${name}View").name())
+            layout_place_it(sol, ct, Java(s"${ct.name}View").name())
         }
-      }
-
-      stmts
-    }
+      }.toSeq
 
     val semanticType: Type = game(game.view)
   }
 
-  def layout_place_it (s:Solitaire, c:Container, view:Name): Seq[Statement] = {
+  def layout_place_it (s:Solitaire, ct:ContainerType, view:Name): Seq[Statement] = {
     // this can all be retrieved from the solitaire domain model by
     // checking if a tableau is present, then do the following, etc... for others
     // c.placements().asScala.flatMap {
-    s.placements(c).asScala.flatMap {
-      r => Java(s"""
-                   |$view[${r.idx}].setBounds(${r.x}, ${r.y}, ${r.width}, ${r.height});
-                   |addViewWidget($view[${r.idx}]);
+   s.layout.places(ct).zipWithIndex.flatMap { case (r, idx) =>
+          Java(s"""
+                   |$view[$idx].setBounds(${r.x}, ${r.y}, ${r.width}, ${r.height});
+                   |addViewWidget($view[$idx]);
             """.stripMargin).statements()
-    }.toSeq
+    }
   }
 
   /** Used when you know in advance there is only one widget and you've chosen not to use array. */
-  def layout_place_one (s:Solitaire, c:Container, view:Name): Seq[Statement] = {
+  def layout_place_one (s:Solitaire, ct:ContainerType, view:Name): Seq[Statement] = {
     // this can all be retrieved from the solitaire domain model by
     // checking if a tableau is present, then do the following, etc... for others
     //c.placements().asScala.flatMap {
-    s.placements(c).asScala.flatMap {
-      r => Java(s"""
-                   |$view.setBounds(${r.x}, ${r.y}, ${r.width}, ${r.height});
-                   |addViewWidget($view);
-            """.stripMargin).statements()
-    }.toSeq
+    s.layout.places(ct).zipWithIndex.flatMap { case (r, idx) =>
+         Java(s"""|$view.setBounds(${r.x}, ${r.y}, ${r.width}, ${r.height});
+                  |addViewWidget($view);
+              """.stripMargin).statements()
+    }
   }
 
   /** Process Solitaire domain model to construct game(game.model). */
   class ProcessModel (sol:Solitaire) {
     def apply: Seq[Statement] = {
-      var stmts: Seq[Statement] = Seq.empty
-      for (containerType:ContainerType <- sol.containers.keySet.asScala) {
-        val container = sol.containers.get(containerType)
-        val name = containerType.getName
 
-        container match {
-
-          case d: Stock =>
-            stmts = stmts ++ deckGen(name, d)
-
-          case _ =>
-            val tpe: String = container.types().next
-
-            stmts = stmts ++ loopConstructGen(container, name, tpe)
+      sol.structure.flatMap { case (ct, elements) =>
+        ct match {
+          case StockContainer => deckGen("deck", elements)
+          case _ => loopConstructGen(ct, ct.name, elements, elements.head.name)
         }
-      }
-
-      stmts
+      }.toSeq
     }
 
     val semanticType: Type = game(game.model)
@@ -264,21 +247,26 @@ trait Initialization extends SemanticTypes {
     *
     * @param modelName    name of model element to create
     */
-  def deckGen (modelName:String, stock:Container):Seq[Statement] = {
+  def deckGen (modelName:String, stock:Seq[Element]):Seq[Statement] = {
 
-    val decks =
-      if (stock.size > 1) {
-        Java(
-          s"""|// Multi-decks are constructed from stock size.
-              |$modelName = new MultiDeck ("$modelName", ${stock.size});
-              |""".stripMargin).statements()
+    // will be a single deck in the stock
+    val decks = stock.head match {
+      case Stock(n) =>
+        if (n > 1) {
+          Java(
+            s"""|// Multi-decks are constructed from stock size.
+                |$modelName = new MultiDeck ("$modelName", $n);
+                |""".stripMargin).statements
 
-      } else {
-        Java(
-          s"""|// Single deck instantiated as is
-              |$modelName = new Deck ("$modelName");
-              |""".stripMargin).statements()
-      }
+        } else {
+          Java(
+            s"""|// Single deck instantiated as is
+                |$modelName = new Deck ("$modelName");
+                |""".stripMargin).statements
+        }
+
+      case _ => Seq.empty
+    }
 
     decks ++ Java(s"""|// Basic start of pretty much any solitaire game that requires a deck.
                       |int seed = getSeed();
@@ -296,10 +284,10 @@ trait Initialization extends SemanticTypes {
     * HACK
     * @return
     */
-  def deckFieldGen(stock:Container) : Seq[FieldDeclaration] = {
+  def deckFieldGen(stock:Seq[Element]) : Seq[FieldDeclaration] = {
 
     val decks =
-      if (stock.size() > 1) {
+      if (stock.size > 1) {
         Java("public MultiDeck deck;").fieldDeclarations()
       } else {
         Java("public Deck deck;").fieldDeclarations()

@@ -2,17 +2,18 @@ package pysolfc.klondike
 
 import javax.inject.Inject
 
+import org.combinators.solitaire.domain._
 import org.combinators.templating.persistable.PythonWithPath
 import org.combinators.templating.persistable.PythonWithPathPersistable._
 import org.combinators.cls.interpreter.ReflectedRepository
 import org.combinators.cls.git.{EmptyResults, InhabitationController, Results}
-import domain.klondike.Domain
 import org.webjars.play.WebJarsUtil
 import play.api.inject.ApplicationLifecycle
 
 class Klondike @Inject()(webJars: WebJarsUtil, applicationLifecycle: ApplicationLifecycle) extends InhabitationController(webJars, applicationLifecycle) {
 
-  val domainModel = new Domain()
+  //val domainModel = new klondike.KlondikeDomain()
+  val domainModel = org.combinators.solitaire.klondike.klondike  // TODO: FIX ME   new klondike.EastCliff()
 
   // FreeCellDomain is base class for the solitaire variation. Note that this
   // class is used (essentially) as a placeholder for the solitaire val,

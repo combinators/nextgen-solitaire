@@ -4,40 +4,54 @@ import javax.inject.Inject
 
 import com.github.javaparser.ast.CompilationUnit
 import org.combinators.cls.interpreter.ReflectedRepository
-import org.combinators.cls.git.{EmptyResults, InhabitationController}
+import org.combinators.cls.git._
+import org.combinators.cls.types.{Constructor, Type}
 import org.combinators.templating.persistable.JavaPersistable._
 import org.webjars.play.WebJarsUtil
 import play.api.inject.ApplicationLifecycle
-import time.{TemperatureUnit, TimeGadget}
+import time._
+import org.combinators.cls.types.syntax._
 
-class TimeGadgetController @Inject()(webJars: WebJarsUtil, applicationLifecycle: ApplicationLifecycle) extends InhabitationController(webJars, applicationLifecycle) {
+import scala.collection.JavaConverters._
 
-  val gadget = new TimeGadget("Worcester", "01609", TemperatureUnit.Fahrenheit)
+class TimeGadget @Inject()(webJars: WebJarsUtil, applicationLifecycle: ApplicationLifecycle) extends InhabitationController(webJars, applicationLifecycle) with RoutingEntries   {
 
-  lazy val repository = new Concepts {}
+  // domain model. Add the features you want, in the order they will be processed
+  //    Weather gets checked every thirty minutes
+  //    Extremes use sliding window with Daily time period
+  val min30 = new FrequencyFeature(30, FrequencyUnit.Minute)
+  val weatherFeature = new WeatherFeature("Worcester", "01609", TemperatureUnit.Fahrenheit, min30)
+  val extremeFeature = new ExtremaFeature(FrequencyUnit.Day)
+  val domainModel:Gadget = new Gadget()
+    .add(weatherFeature)
+    .add(extremeFeature)
+
+  lazy val repository = new Concepts(domainModel) {}
   import repository._
-  lazy val Gamma =
-    ReflectedRepository(repository, substitutionSpace=kinding, classLoader = this.getClass.getClassLoader)
-        .addCombinator(new CurrentTemperature(gadget.zip))
+
+  lazy val Gamma = ReflectedRepository(repository, substitutionSpace=kinding, classLoader = this.getClass.getClassLoader)
+        .addCombinator(new Combined_Temp_Extrema())    // should be inferred from the domain...
+        .addCombinator(new Combined_Temp_Extrema_Code(weatherFeature.temperatureUnit))
+        .addCombinator(new CurrentTemperature(weatherFeature))
+        .addCombinator(new MainCode())
+
   lazy val combinatorComponents = Gamma.combinatorComponents
 
-  lazy val jobs = Gamma.InhabitationBatchJob[CompilationUnit](artifact(artifact.mainProgram, feature(feature.temperature(gadget.temperatureUnit))))
+  // request artifacts for the solution domain. Call for a main program with features
+  // seek inhabitation for all features associated with the model, in addition to core gadget code
+  //lazy val targets = domainModel.iterator.asScala.map{ f => artifact(artifact.extraCode, feature(f)) }.toSeq
 
-  lazy val results = EmptyResults().addAll(jobs.run())
+  lazy val targets:Seq[Type] = Seq.empty :+ artifact(artifact.mainProgram, feature(FeatureUnit.Weather) :&: feature(FeatureUnit.Extrema) :&: feature(FeatureUnit.Frequency))
+
+  //lazy val targets:Seq[Type] = Seq.empty :+ Constructor("All")
+
+  //  artifact(artifact.mainProgram, featureType :&: feature(freqFeature))
+
+  lazy val results:Results = EmptyInhabitationBatchJobResults(Gamma)
+        .addJobs[CompilationUnit](targets)
+        .compute()
+
+  // EmptyInhabitationBatchJobResults(Gamma).addJobs[CompilationUnit](Synthesizer.allTargets(variation)).compute()
+
+  lazy val controllerAddress: String = "gadget"
 }
-
-// sample code showing how to directly invoke, without web service.
-/*object Manual {
-
-  def main(args: Array[String]): Unit = {
-    lazy val repository = new Concepts {}
-    import repository._
-    lazy val Gamma = ReflectedRepository(repository, kinding = kinding)
-
-    println("Expressions that return Fahrenheit")
-    Gamma.inhabit[Expression](artifact(artifact.compute) :&: precision(precision.floating) :&: unit(unit.fahrenheit))
-      .interpretedTerms.values.flatMap(_._2)
-      .foreach(exp => println(exp))
-
-  }
-}*/

@@ -1,41 +1,98 @@
-
 ->    /                              org.combinators.cls.git.Routes
 
-GET   /archway                      org.combinators.solitaire.archway.Archway.overview()
-GET   /archway/raw_:number          org.combinators.solitaire.archway.Archway.raw(number: Long)
-GET   /archway/prepare              org.combinators.solitaire.archway.Archway.prepare(number: Long)
-GET   /archway/archway.git/*file   org.combinators.solitaire.archway.Archway.serveFile(file)
+# To automatically synthesize all solitaire variants using [[buildTest.TestSynthesis]], make
+# sure that all solitaire class names start with org.combinators.solitaire.*
+#
+# All stand-alone names are simply package.MainClass
+->    /                              org.combinators.solitaire.archway.Archway
+->    /                              org.combinators.solitaire.idiot.Idiot
+->    /                              org.combinators.solitaire.bigforty.BigForty
+->    /                              org.combinators.solitaire.castle.Castle
+->    /                              org.combinators.solitaire.narcotic.Narcotic
+#->    /                              org.combinators.solitaire.narcoticTest.NarcoticTest
+#->    /                              org.combinators.solitaire.simplesimon.Simplesimon
+->    /                              org.combinators.solitaire.minimal.Minimal
+->    /                              org.combinators.solitaire.napoleon.Napoleon
+->    /                              org.combinators.solitaire.gamma.Gamma
+# All variants have names that end in "Controller", and then can extract package.MainClass easily
+->    /                              org.combinators.solitaire.bakersdozen.BakersdozenController
+->    /                              org.combinators.solitaire.bakersdozen.Spanish_PatienceController
+->    /                              org.combinators.solitaire.bakersdozen.Castles_In_SpainController
+->    /                              org.combinators.solitaire.freecell.FreeCellController
+->    /                              org.combinators.solitaire.freecell.ChallengeFreeCellController
+->    /                              org.combinators.solitaire.freecell.SuperChallengeFreeCellController
+->    /                              org.combinators.solitaire.freecell.ForeCellController
+->    /                              org.combinators.solitaire.freecell.DoubleFreeCellController
+->    /                              org.combinators.solitaire.freecell.StalactitesController
+
+->    /                              org.combinators.solitaire.fan.FanController
+->    /                              org.combinators.solitaire.fan.FanFreePileController
+->    /                              org.combinators.solitaire.fan.ShamrocksController
+->    /                              org.combinators.solitaire.fan.ScotchPatienceController
+->    /                              org.combinators.solitaire.fan.FanTwoDeckController
+->    /                              org.combinators.solitaire.fan.FanEasyController
+->    /                              org.combinators.solitaire.fan.LaBelleLucieController
+->    /                              org.combinators.solitaire.fan.SuperFlowerGardenController
+->    /                              org.combinators.solitaire.fan.TrefoilController
+->    /                              org.combinators.solitaire.fan.AlexanderTheGreatController
+
+->    /                              org.combinators.solitaire.klondike.KlondikeController
+->    /                              org.combinators.solitaire.klondike.WhiteheadController
+->    /                              org.combinators.solitaire.klondike.EastcliffController
+->    /                              org.combinators.solitaire.klondike.SmallHarpController
+->    /                              org.combinators.solitaire.klondike.ThumbAndPouchController
+->    /                              org.combinators.solitaire.klondike.DealByThreeController
+->    /                              org.combinators.solitaire.klondike.EastHavenController
+->    /                              org.combinators.solitaire.klondike.DoubleEastHavenController
+->    /                              org.combinators.solitaire.klondike.TripleEastHavenController
+
+->    /                              org.combinators.solitaire.alpha.Alpha
+->    /                              org.combinators.solitaire.beta.Beta
+->    /                              org.combinators.solitaire.delta.Delta
+
+->    /                              org.combinators.solitaire.golf.GolfController
+->    /                              org.combinators.solitaire.golf.Golf_no_wrapController
+->    /                              org.combinators.solitaire.golf.AllInARowController
+->    /                              org.combinators.solitaire.golf.FlakeController
+->    /                              org.combinators.solitaire.golf.Flake_two_decksController
+->    /                              org.combinators.solitaire.golf.RobertController
 
 
-GET   /narcotic                      org.combinators.solitaire.narcotic.Narcotic.overview()
-GET   /narcotic/raw_:number          org.combinators.solitaire.narcotic.Narcotic.raw(number: Long)
-GET   /narcotic/prepare              org.combinators.solitaire.narcotic.Narcotic.prepare(number: Long)
-GET   /narcotic/narcotic.git/*file   org.combinators.solitaire.narcotic.Narcotic.serveFile(file)
+->    /                              org.combinators.solitaire.spider.SpiderController
+->    /                              org.combinators.solitaire.spider.SpideretteController
+->    /                              org.combinators.solitaire.spider.ScorpionController
+->    /                              org.combinators.solitaire.spider.MrsMopController
+->    /                              org.combinators.solitaire.spider.GiganticController
+->    /                              org.combinators.solitaire.spider.SpiderwortController
+->    /                              org.combinators.solitaire.spider.BabyController
+->    /                              org.combinators.solitaire.spider.OpenSpiderController
+->    /                              org.combinators.solitaire.spider.OpenScorpionController
+->    /                              org.combinators.solitaire.spider.CurdsAndWheyController
 
-GET   /freecell                      org.combinators.solitaire.freecell.FreeCell.overview()
-GET   /freecell/raw_:number          org.combinators.solitaire.freecell.FreeCell.raw(number: Long)
-GET   /freecell/prepare              org.combinators.solitaire.freecell.FreeCell.prepare(number: Long)
-GET   /freecell/freecell.git/*file   org.combinators.solitaire.freecell.FreeCell.serveFile(file)
 
-GET   /idiot                      org.combinators.solitaire.idiot.Idiot.overview()
-GET   /idiot/raw_:number          org.combinators.solitaire.idiot.Idiot.raw(number: Long)
-GET   /idiot/prepare              org.combinators.solitaire.idiot.Idiot.prepare(number: Long)
-GET   /idiot/idiot.git/*file  	  org.combinators.solitaire.idiot.Idiot.serveFile(file)
+->    /                              org.combinators.solitaire.simplesimon.SimplesimonController
+->    /                              org.combinators.solitaire.simplesimon.SimplevarController
 
-GET   /klondike                      org.combinators.solitaire.klondike.Klondike.overview()
-GET   /klondike/raw_:number          org.combinators.solitaire.klondike.Klondike.raw(number: Long)
-GET   /klondike/prepare              org.combinators.solitaire.klondike.Klondike.prepare(number: Long)
-GET   /klondike/klondike.git/*file  	  org.combinators.solitaire.klondike.Klondike.serveFile(file)
 
-GET   /castle                      org.combinators.solitaire.castle.Castle.overview()
-GET   /castle/raw_:number          org.combinators.solitaire.castle.Castle.raw(number: Long)
-GET   /castle/prepare              org.combinators.solitaire.castle.Castle.prepare(number: Long)
-GET   /castle/castle.git/*file  	  org.combinators.solitaire.castle.Castle.serveFile(file)
 
-GET   /pyarchway                        pysolfc.archway.Archway.overview()
-GET   /pyarchway/raw_:number             pysolfc.archway.Archway.raw(number: Long)
-GET   /pyarchway/prepare                 pysolfc.archway.Archway.prepare(number: Long)
+
+->    /                              org.combinators.solitaire.gypsy.GypsyController
+->    /                              org.combinators.solitaire.gypsy.GiantController
+->    /                              org.combinators.solitaire.gypsy.NomadController
+->    /                              org.combinators.solitaire.gypsy.EastHavenController
+->    /                              org.combinators.solitaire.gypsy.IrmgardController
+->    /                              org.combinators.solitaire.gypsy.MilliganCellController
+
+
+GET   /pyarchway                          pysolfc.archway.Archway.overview()
+GET   /pyarchway/raw_:number              pysolfc.archway.Archway.raw(number: Long)
+GET   /pyarchway/prepare                  pysolfc.archway.Archway.prepare(number: Long)
 GET   /pyarchway/pyarchway.git/*file      pysolfc.archway.Archway.serveFile(file)
+
+GET   /pyminimal                          pysolfc.minimal.Minimal.overview()
+GET   /pyminimal/raw_:number              pysolfc.minimal.Minimal.raw(number: Long)
+GET   /pyminimal/prepare                  pysolfc.minimal.Minimal.prepare(number: Long)
+GET   /pyminimal/pyminimal.git/*file      pysolfc.minimal.Minimal.serveFile(file)
 
 GET   /pycastle                         pysolfc.castle.Castle.overview()
 GET   /pycastle/raw_:number             pysolfc.castle.Castle.raw(number: Long)
@@ -57,17 +114,14 @@ GET   /pynarcotic/raw_:number             pysolfc.narcotic.Narcotic.raw(number: 
 GET   /pynarcotic/prepare                 pysolfc.narcotic.Narcotic.prepare(number: Long)
 GET   /pynarcotic/pynarcotic.git/*file    pysolfc.narcotic.Narcotic.serveFile(file)
 
-GET   /bigforty                      org.combinators.solitaire.bigforty.BigForty.overview()
-GET   /bigforty/raw_:number          org.combinators.solitaire.bigforty.BigForty.raw(number: Long)
-GET   /bigforty/prepare              org.combinators.solitaire.bigforty.BigForty.prepare(number: Long)
-GET   /bigforty/bigforty.git/*file   org.combinators.solitaire.bigforty.BigForty.serveFile(file)
-
 GET   /temperature                          example.temperature.Temperature.overview()
 GET   /temperature/raw_:number              example.temperature.Temperature.raw(number: Long)
 GET   /temperature/prepare                  example.temperature.Temperature.prepare(number: Long)
 GET   /temperature/temperature.git/*file    example.temperature.Temperature.serveFile(file)
 
-GET   /timeGadget                          example.timeGadget.TimeGadgetController.overview()
-GET   /timeGadget/raw_:number              example.timeGadget.TimeGadgetController.raw(number: Long)
-GET   /timeGadget/prepare                  example.timeGadget.TimeGadgetController.prepare(number: Long)
-GET   /timeGadget/timeGadget.git/*file    example.timeGadget.TimeGadgetController.serveFile(file)
+GET   /pyfan                          pysolfc.fan.Fan.overview()
+GET   /pyfan/raw_:number              pysolfc.fan.Fan.raw(number: Long)
+GET   /pyfan/prepare                  pysolfc.fan.Fan.prepare(number: Long)
+GET   /pyfan/pyfan.git/*file      pysolfc.fan.Fan.serveFile(file)
+
+->    /                                   example.timeGadget.TimeGadget

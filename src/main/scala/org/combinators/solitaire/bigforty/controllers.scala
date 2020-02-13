@@ -9,7 +9,7 @@ import org.combinators.cls.interpreter.{ReflectedRepository, combinator}
 import org.combinators.cls.types.Type
 import org.combinators.templating.twirl.Java
 import org.combinators.generic
-import domain._
+import org.combinators.solitaire.domain.Solitaire
 
 trait controllers extends shared.Controller with shared.Moves with GameTemplate with WinningLogic with generic.JavaCodeIdioms {
   override def init[G <: SolitaireDomain](gamma: ReflectedRepository[G], s: Solitaire): ReflectedRepository[G] = {
@@ -17,10 +17,9 @@ trait controllers extends shared.Controller with shared.Moves with GameTemplate 
     println(">>> BigForty Controller dynamic combinators.")
 
     updated = createMoveClasses(updated, s)
-
     updated = createDragLogic(updated, s)
-
     updated = generateMoveLogic(updated, s)
+    updated = generateExtendedClasses(updated, s)
 
     // these all have to do with GUI commands being ignored
     updated = updated
@@ -52,7 +51,6 @@ trait controllers extends shared.Controller with shared.Moves with GameTemplate 
       .addCombinator (new ProcessFields(s))
 
     updated
-
   }
 
   // deck can be flipped to wastepiile. Once empty, reset from wastepile

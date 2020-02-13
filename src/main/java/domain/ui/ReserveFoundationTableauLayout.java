@@ -1,33 +1,27 @@
 package domain.ui;
 
+import domain.Container;
 import domain.Solitaire;
+import domain.SolitaireContainerTypes;
 
-import java.awt.*;
+import java.awt.Point;
 
-public class ReserveFoundationTableauLayout {
+/**
+ * Place reserve starting from left upper corner. Then leave gap for foundation.
+ *
+ * Then starting below both (flush left) do the tableau
+ */
+public class ReserveFoundationTableauLayout extends Layout {
 
-    /**
-     * Reserve in upper left corner.
-     */
-    public PlacementGenerator reserve() {
-        return new HorizontalPlacement(new Point(15, 20),
-                Solitaire.card_width, Solitaire.card_height, Solitaire.card_gap);
+    public ReserveFoundationTableauLayout(Container reserve, Container foundation, Container tableau) {
+        add (SolitaireContainerTypes.Reserve, new HorizontalPlacement(new Point(15, 20),
+                Solitaire.card_width, Solitaire.card_height, Solitaire.card_gap));
+
+        int total = reserve.size()*(Solitaire.card_width + Solitaire.card_gap);
+        add (SolitaireContainerTypes.Foundation, new HorizontalPlacement(new Point(15 + total, 20),
+                Solitaire.card_width, Solitaire.card_height, Solitaire.card_gap));
+
+        add (SolitaireContainerTypes.Tableau, new HorizontalPlacement(new Point (15, Solitaire.card_height+40),
+                Solitaire.card_width,13*Solitaire.card_height, Solitaire.card_gap));
     }
-
-    /**
-     * Foundation in upper right corner.
-     */
-    public PlacementGenerator foundation() {
-        return new HorizontalPlacement(new Point(390, 20),
-                Solitaire.card_width, Solitaire.card_height, Solitaire.card_gap);
-    }
-
-    /**
-     * Tableau in lower half.
-     */
-    public PlacementGenerator tableau() {
-        return new HorizontalPlacement(new Point (15, 137),
-                Solitaire.card_width,13*Solitaire.card_height, Solitaire.card_gap);
-    }
-
 }

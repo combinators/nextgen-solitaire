@@ -1,18 +1,16 @@
 package org.combinators.solitaire.narcotic
 
 import com.github.javaparser.ast.ImportDeclaration
-import com.github.javaparser.ast.body.MethodDeclaration
+import com.github.javaparser.ast.body.{BodyDeclaration, MethodDeclaration}
 import com.github.javaparser.ast.expr.{Expression, Name}
+import com.github.javaparser.ast.stmt.Statement
 import org.combinators.cls.interpreter.combinator
 import org.combinators.cls.types._
 import org.combinators.cls.types.syntax._
 import org.combinators.templating.twirl.Java
-import domain.narcotic.{AllSameRank, ToLeftOf}
+import org.combinators.solitaire.domain._
 import org.combinators.solitaire.shared._
 import org.combinators.solitaire.shared.compilation.{CodeGeneratorRegistry, generateHelper}
-
-// domain
-import domain._
 
 // Looks awkward how solitaire val is defined, but I think I need to do this
 // to get the code to compile 
@@ -30,15 +28,19 @@ class gameDomain(override val solitaire:Solitaire) extends SolitaireDomain(solit
       },
 
       CodeGeneratorRegistry[Expression, AllSameRank] {
-        case (_:CodeGeneratorRegistry[Expression], _:AllSameRank) =>
-          Java(s"""((org.combinators.solitaire.narcotic.Narcotic)game).allSameRank()""").expression()
+        case (registry:CodeGeneratorRegistry[Expression], all:AllSameRank) =>
+          val inner = registry(all.src).get
+          Java(s"""((org.combinators.solitaire.narcotic.Narcotic)game).allSameRank($inner)""").expression()
 
       }
     ).merge(constraintCodeGenerators.generators)
   }
 
   @combinator object NarcoticGenerator {
-    def apply: CodeGeneratorRegistry[Expression] = narcoticCodeGenerator.generators
+    def apply: CodeGeneratorRegistry[Expression] = {
+      print ("In ngen")
+      narcoticCodeGenerator.generators
+    }
     val semanticType: Type = constraints(constraints.generator)
   }
 
@@ -51,11 +53,24 @@ class gameDomain(override val solitaire:Solitaire) extends SolitaireDomain(solit
   }
 
   @combinator object HelperMethodsNarcotic {
-    def apply(): Seq[MethodDeclaration] = generateHelper.helpers(solitaire)
+    def apply(): Seq[BodyDeclaration[_]] = generateHelper.helpers(solitaire)
 
     val semanticType: Type = constraints(constraints.methods)
   }
 
+  /** Each Solitaire variation must provide default do generation. */
+  @combinator object DefaultDoGenerator {
+    def apply: CodeGeneratorRegistry[Seq[Statement]] = constraintCodeGenerators.doGenerators
+
+    val semanticType: Type = constraints(constraints.do_generator)
+  }
+
+  /** Each Solitaire variation must provide default conversion for moves. */
+  @combinator object DefaultUndoGenerator {
+    def apply: CodeGeneratorRegistry[Seq[Statement]] = constraintCodeGenerators.undoGenerators
+
+    val semanticType: Type = constraints(constraints.undo_generator)
+  }
 
   // vagaries of java imports means these must be defined as well.
   @combinator object ExtraImports {
@@ -83,12 +98,12 @@ class gameDomain(override val solitaire:Solitaire) extends SolitaireDomain(solit
                |  return false; // will never get here
                |}
                |
-                | public boolean allSameRank() {
-               |   if (tableau[0].empty()) { return false; }
+                | public boolean allSameRank(Stack[] group) {
+               |   if (group[0].empty()) { return false; }
                |   // Check whether tops of all piles are same rank
-               |   for (int i = 1; i < tableau.length; i++) {
-               |      if (tableau[i].empty()) { return false; }
-               |      if (tableau[i].rank() != tableau[i-1].rank()) {
+               |   for (int i = 1; i < group.length; i++) {
+               |      if (group[i].empty()) { return false; }
+               |      if (group[i].rank() != group[i-1].rank()) {
                |        return false;
                |      }
                |   }

@@ -1,13 +1,14 @@
 package org.combinators.solitaire.archway
 
-import com.github.javaparser.ast.body.MethodDeclaration
+import com.github.javaparser.ast.body.{BodyDeclaration, MethodDeclaration}
 import com.github.javaparser.ast.expr.{Expression, Name}
 import com.github.javaparser.ast.ImportDeclaration
+import com.github.javaparser.ast.stmt.Statement
 import org.combinators.cls.interpreter.combinator
 import org.combinators.cls.types._
 import org.combinators.cls.types.syntax._
 import org.combinators.templating.twirl.Java
-import domain._
+import org.combinators.solitaire.domain._
 import org.combinators.solitaire.shared._
 import org.combinators.solitaire.shared.compilation.{CodeGeneratorRegistry, generateHelper}
 
@@ -18,6 +19,23 @@ import org.combinators.solitaire.shared.compilation.{CodeGeneratorRegistry, gene
   */
 class ArchwayDomain(override val solitaire: Solitaire) extends SolitaireDomain(solitaire) with GameTemplate with Controller {
 
+  // TODO: Should be able to derive this from the modeling
+  override def baseModelNameFromElement (e:Element): String = {
+    e match {
+      case AcesUpPile => "Pile"
+      case KingsDownPile => "Pile"
+      case _ => super.baseModelNameFromElement(e)
+    }
+  }
+
+  override def baseViewNameFromElement (e:Element): String = {
+    e match {
+      case AcesUpPile => "PileView"
+      case KingsDownPile => "PileView"
+      case _ => super.baseViewNameFromElement(e)
+    }
+  }
+
   /**
     * Freecell requires specialized extensions for constraints to work.
     */
@@ -26,8 +44,23 @@ class ArchwayDomain(override val solitaire: Solitaire) extends SolitaireDomain(s
     val semanticType: Type = constraints(constraints.generator)
   }
 
+
+  /** Each Solitaire variation must provide default do generation. */
+  @combinator object DefaultDoGenerator {
+    def apply: CodeGeneratorRegistry[Seq[Statement]] = constraintCodeGenerators.doGenerators
+
+    val semanticType: Type = constraints(constraints.do_generator)
+  }
+
+  /** Each Solitaire variation must provide default conversion for moves. */
+  @combinator object DefaultUndoGenerator {
+    def apply: CodeGeneratorRegistry[Seq[Statement]] = constraintCodeGenerators.undoGenerators
+
+    val semanticType: Type = constraints(constraints.undo_generator)
+  }
+
   @combinator object HelperMethodsArchway {
-    def apply(): Seq[MethodDeclaration] = generateHelper.helpers(solitaire)
+    def apply(): Seq[BodyDeclaration[_]] = generateHelper.helpers(solitaire)
 
     val semanticType: Type = constraints(constraints.methods)
   }
@@ -45,10 +78,10 @@ class ArchwayDomain(override val solitaire: Solitaire) extends SolitaireDomain(s
   /*
    * Because Aces and Kings have differing behavior in the Foundation, I have to make them as subclasses.
    */
-  @combinator object MakeAcesUpPile        extends ExtendModel("Pile",    "AcesUpPile",    'AcesUpPileClass)
-  @combinator object MakeKingsDownPile     extends ExtendModel("Pile",    "KingsDownPile", 'KingsDownPileClass)
-  @combinator object MakeAcesUpPileView    extends ExtendView("PileView", "AcesUpPileView",    "AcesUpPile",    'AcesUpPileViewClass)
-  @combinator object MakeKingsDownPileView extends ExtendView("PileView", "KingsDownPileView", "KingsDownPile", 'KingsDownPileViewClass)
+//  @combinator object MakeAcesUpPile        extends ExtendModel("Pile",    "AcesUpPile",    'AcesUpPileClass)
+//  @combinator object MakeKingsDownPile     extends ExtendModel("Pile",    "KingsDownPile", 'KingsDownPileClass)
+//  @combinator object MakeAcesUpPileView    extends ExtendView("View", "AcesUpPileView",    "AcesUpPile",    'AcesUpPileViewClass)
+//  @combinator object MakeKingsDownPileView extends ExtendView("View", "KingsDownPileView", "KingsDownPile", 'KingsDownPileViewClass)
 
   /**
     * Generates import statements for the model and controller packages.
@@ -64,13 +97,11 @@ class ArchwayDomain(override val solitaire: Solitaire) extends SolitaireDomain(s
   }
 
   /**
-    * Generate extra methods. Here we only need the preferred window size of the game.
+    * Generate extra methods.
     */
   @combinator object ExtraMethods {
     def apply(): Seq[MethodDeclaration] =
-      Java(s"""|public Dimension getPreferredSize() {
-               |  return new Dimension (1280, 1280);
-               |}""".stripMargin).methodDeclarations() ++
+
       Java(s"""
          |public java.util.Enumeration<Move> availableMoves() {
          |        java.util.Vector<Move> v = new java.util.Vector<Move>();
@@ -82,7 +113,7 @@ class ArchwayDomain(override val solitaire: Solitaire) extends SolitaireDomain(s
          |                    v.add(rtf);
          |                }
          |            }
-         |            for (KingsDownPile k : kings) {
+         |            for (KingsDownPile k : kingsdownfoundation) {
          |                ReserveToKingsFoundation rkf = new PotentialReserveToKingsFoundation(r, k);
          |                if (rkf.valid(this)) {
          |                    v.add(rkf);
@@ -104,7 +135,7 @@ class ArchwayDomain(override val solitaire: Solitaire) extends SolitaireDomain(s
          |                }
          |            }
          |            // TODO: The 3H is duplicated when returned to the Tableau.
-         |            for (KingsDownPile k : kings) {
+         |            for (KingsDownPile k : kingsdownfoundation) {
          |                TableauToKingsFoundation tk = new PotentialTableauToKingsFoundation(t, k);
          |                if (tk.valid(this)) {
          |                    v.add(tk);

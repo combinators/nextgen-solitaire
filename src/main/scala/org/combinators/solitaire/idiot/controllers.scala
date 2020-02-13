@@ -9,7 +9,7 @@ import org.combinators.solitaire.shared._
 import org.combinators.solitaire.shared
 import org.combinators.cls.interpreter.ReflectedRepository
 import org.combinators.generic
-import domain._
+import org.combinators.solitaire.domain.Solitaire
 
 trait controllers extends shared.Controller with shared.Moves with GameTemplate with WinningLogic with generic.JavaCodeIdioms  {
 
@@ -19,10 +19,10 @@ trait controllers extends shared.Controller with shared.Moves with GameTemplate 
     println (">>> Idiot Controller dynamic combinators.")
 
     updated = createMoveClasses(updated, s)
-
     updated = createDragLogic(updated, s)
-
     updated = generateMoveLogic(updated, s)
+    updated = generateExtendedClasses(updated, s)
+
 
     // Each move has a source and a target. The SOURCE is the locus
     // for the PRESS while the TARGET is the locus for the RELEASE.

@@ -1,6 +1,5 @@
 package domain;
 
-import domain.ui.*;
 import java.util.*;
 
 /**
@@ -18,8 +17,8 @@ public class Container implements Iterable<Element> {
 	/** Use what is available. */
 	ArrayList<Element> elements = new ArrayList<>();
 
-	/** Iterator for placing widgets in container. */
-	//final PlacementGenerator places;
+	/** Associated ContainerType for this Container. */
+	public final ContainerType type;
 
 	/**
 	 * Default constructor for subclasses (i.e., Stock) which may be present in the model
@@ -27,38 +26,10 @@ public class Container implements Iterable<Element> {
 	 *
 	 * Use this only for non-visible Containers (again, only likely for Stock)
 	 */
-	public Container() {
-
+	public Container(ContainerType type) {
+		this.type = type;
 	}
 
-	/**
-	 * Specialized layout is determined by the defined iterator.
-	 *
-	 * Use this constructor for containers that have arbitrary arrangements.
-	 *
-	 * @param places   Iterator for placement of widgets
-	 */
-//	@Deprecated
-//	private Container(PlacementGenerator places) {
-//		this.places = places;
-//	}
-
-    /**
-     * Retrieve Iterator of Widgets reflecting the elements in the container.
-	 *
-     * @return    Widget objects, each with their boundaries and index into the container.
-     */
-//	@Deprecated
-//    private Iterator<Widget> placements() {
-//		places.reset(size());
-//		return places;
-//	}
-
-	/** Some containers have no visible presence (as detected by no widgets in placements). */
-//    @Deprecated
-//    private boolean isInvisible() {
-//		return !placements().hasNext();
-//	}
 
 	/** Return the size of the container. */
 	public int size() {

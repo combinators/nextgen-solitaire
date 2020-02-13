@@ -1,6 +1,6 @@
 package org.combinators.solitaire.shared
 
-import com.github.javaparser.ast.body.{FieldDeclaration, MethodDeclaration}
+import com.github.javaparser.ast.body.{BodyDeclaration, FieldDeclaration, MethodDeclaration, TypeDeclaration}
 import com.github.javaparser.ast.expr.{Name, SimpleName}
 import com.github.javaparser.ast.stmt.Statement
 import com.github.javaparser.ast.{CompilationUnit, ImportDeclaration}
@@ -9,12 +9,9 @@ import org.combinators.cls.types._
 import org.combinators.cls.types.syntax._
 import org.combinators.solitaire.shared
 import org.combinators
+import org.combinators.solitaire.domain._
 import org.combinators.templating.twirl.Java
 
-
-// domain
-import domain._
-import domain.ui._
 
 trait GameTemplate extends Base with Controller with Initialization with SemanticTypes with WinningLogic with DealLogic  {
 
@@ -25,7 +22,7 @@ trait GameTemplate extends Base with Controller with Initialization with Semanti
     var updated = super.init(gamma, s)
 
     // handle game
-    if (s.isSolvable) {
+    if (s.solvable) {
       updated = updated
         .addCombinator(new MainSolitaireSolvable(s))
     } else {
@@ -33,7 +30,7 @@ trait GameTemplate extends Base with Controller with Initialization with Semanti
         .addCombinator(new MainGame(s))
     }
     /** handles generating default (empty) automoves. */
-    if (!s.hasAutoMoves) {
+    if (!s.autoMoves) {
       updated = updated
         .addCombinator(NoAutoMovesAvailable)
     } else {
@@ -42,22 +39,62 @@ trait GameTemplate extends Base with Controller with Initialization with Semanti
     }
 
     /** Get controllers defined based on solitaire domain. */
-    val ui = new UserInterface(s)
 
-    val els_it = ui.controllers
-    while (els_it.hasNext) {
-      val el = els_it.next()
-      val elt:Constructor = Constructor(el)
+    /** For all visible containers, returns HEAD of each element set, since types are unique to a set */
+//    val visibleElements = s.structure.collect { case (ct,els) if s.layout.isVisible(ct) => els.head }
+//
+//    visibleElements.foreach(e => {
+//        val elt:Constructor = Constructor(e.name)
+//        updated = updated
+//          .addCombinator (new WidgetController(elt))
+//          .addCombinator (new ControllerNaming(elt))
+//      })
 
-      // Each of these controllers are expected in the game.
+    s.structure.collect { case (ct,els) if s.layout.isVisible(ct) => {
+      val name = ct match {
+        case StockContainer => "Deck"
+        case _ => els.head.name
+      }
+      val elt:Constructor = Constructor(name)
       updated = updated
         .addCombinator (new WidgetController(elt))
         .addCombinator (new ControllerNaming(elt))
-    }
+    }}
+
 
     updated
   }
 
+
+  def modelNameFromElement (e:Element): String = e.name
+  def viewNameFromElement (e:Element): String = e.name + "View"
+
+  /**
+    * Any variation that seeks to add their own specialized elements must override these methods properly.
+    * @param e
+    * @return
+    */
+  // override as needed in your own own specialized trait. I.e. "AcesUpPile" -> "PileView"
+  def baseViewNameFromElement (e:Element): String = viewNameFromElement(e)
+  // override as needed in your own own specialized trait. I.e. "AcesUpPile" -> "Pile"
+  def baseModelNameFromElement (e:Element): String = modelNameFromElement(e)
+
+  // construct specialized classes based on registered domain elements
+  def generateExtendedClasses[G <: SolitaireDomain](gamma : ReflectedRepository[G], s:Solitaire) : ReflectedRepository[G] = {
+    var updated = gamma
+    // Model classes
+    for (e <- s.specializedElements) {
+      val parent: String = baseModelNameFromElement(e)    // e.getClass.getSuperclass.getSimpleName
+      val name: String = e.name
+      updated = updated
+        .addCombinator(new ExtendModel(parent, name, classes(name), e.modelMethods, e.modelImports))
+
+      updated = updated
+        .addCombinator(new ExtendView(baseViewNameFromElement(e), viewNameFromElement(e), name, classes(viewNameFromElement(e)), e.viewMethods, e.viewImports))
+    }
+
+    updated
+  }
 
   /**
     * Every solitaire variation belongs in its own package. Take name of game
@@ -87,11 +124,11 @@ trait GameTemplate extends Base with Controller with Initialization with Semanti
     val semanticType: Type = game(game.autoMoves)
   }
 
-  class ExtendModel(parent: String, subclass: String, typ:Symbol) {
+  class ExtendModel(parent: String, subclass: String, typ:Constructor, modelMethods:Seq[BodyDeclaration[_]] = Seq.empty, modelImports:Seq[ImportDeclaration] =  Seq.empty) {
 
     def apply(rootPackage: Name): CompilationUnit = {
       val name = rootPackage.toString()
-      Java(s"""package $name;
+      val comp = Java(s"""package $name;
                 import ks.common.model.*;
                 public class $subclass extends $parent {
 		  public $subclass (String name) {
@@ -99,23 +136,32 @@ trait GameTemplate extends Base with Controller with Initialization with Semanti
 		  }
 		}
 	     """).compilationUnit()
+
+      val clazz  = comp.getTypes.get(0)
+      modelMethods.foreach {m => clazz.addMember(m) }
+      modelImports.foreach { i => comp.addImport(i) }
+      comp
     }
 
     val semanticType : Type = packageName =>: typ
   }
 
-  class ExtendView(parent: String, subclass: String, model: String, typ:Symbol) {
+  class ExtendView(parent: String, subclass: String, model: String, typ:Constructor, viewMethods:Seq[BodyDeclaration[_]] =  Seq.empty, viewImports:Seq[ImportDeclaration] =  Seq.empty) {
 
     def apply(rootPackage: Name): CompilationUnit = {
       val name = rootPackage.toString()
-      Java(s"""package $name;
+      val comp  = Java(s"""package $name;
                 import ks.common.view.*;
                 public class $subclass extends $parent {
                   public $subclass ($model element) {
                     super(element);
                   }
                 }
-             """).compilationUnit()
+             """)compilationUnit()
+      val clazz  = comp.getTypes.get(0)
+      viewMethods.foreach {m => clazz.addMember(m) }
+      viewImports.foreach {i => comp.addImport(i) }
+      comp
     }
 
     val semanticType : Type = packageName =>: typ
@@ -145,15 +191,36 @@ trait GameTemplate extends Base with Controller with Initialization with Semanti
               initializeSteps: Seq[Statement],
               winParameter: Seq[Statement]): CompilationUnit = {
 
-      shared.java.GameTemplate
+
+      val comp = shared.java.GameTemplate
         .render(rootPackage = rootPackage,
-          extraImports = extraImports,
           nameParameter = nameParameter,
-          extraFields = extraFields,
-          extraMethods = extraMethods,
           winParameter = winParameter,
           initializeSteps = initializeSteps)
         .compilationUnit()
+
+      // add extra imports, fields and methods
+      val clazz:TypeDeclaration[_] = comp.getTypes.get(0)
+
+      extraImports.foreach { i => comp.addImport(i) }
+      extraMethods.foreach { m => clazz.addMember(m) }
+      extraFields.foreach { f => clazz.addMember(f) }
+
+      // Standard size of GUI is Dimension(769, 635). If bigger, add a method
+      val (width, height) = sol.layout.minimumSize
+      if (width > 769 || height > 635) {
+        def max(x:Int, y:Int) = { if (x > y) x else y }
+        Java(
+          s"""
+             |@Override
+             |public Dimension getPreferredSize() {
+             |	// default starting dimensions...
+             |  return new Dimension(${max(769, width)}, ${max(635, height)});
+             |}""".stripMargin).methodDeclarations()
+          .foreach { m => clazz.addMember(m) }
+      }
+
+      comp
     }
 
     val semanticType: Type =
@@ -183,19 +250,40 @@ trait GameTemplate extends Base with Controller with Initialization with Semanti
       val comp = shared.java.GameTemplate
         .render(
           rootPackage = rootPackage,
-          extraImports = extraImports,
           nameParameter = nameParameter,
-          extraFields = extraFields,
-          extraMethods = extraMethods,
           winParameter = winParameter,
           initializeSteps = initializeSteps)
         .compilationUnit()
 
+      // add extra imports, fields and methods
+      val clazz:TypeDeclaration[_] = comp.getTypes.get(0)
+
+      extraImports.foreach { i => comp.addImport(i) }
+      extraMethods.foreach { m => clazz.addMember(m) }
+      extraFields.foreach { f => clazz.addMember(f) }
+
+      // Standard size of GUI is Dimension(769, 635). If bigger, add a method
+      val (width, height) = sol.layout.minimumSize
+      if (width > 769 || height > 635) {
+        def max(x:Int, y:Int) = { if (x > y) x else y }
+        Java(
+          s"""
+             |@Override
+             |public Dimension getPreferredSize() {
+             |	// default starting dimensions...
+             |  return new Dimension(${max(769, width)}, ${max(635, height)});
+             |}""".stripMargin).methodDeclarations()
+          .foreach { m => clazz.addMember(m) }
+      }
+
       // introspect from solitaire domain model
-      if (sol.isSolvable) {
-        val clazz = comp.getClassByName(nameParameter.toString).get
-        val solvable = Java("SolvableSolitaire").tpe.asClassOrInterfaceType()
-        clazz.getImplementedTypes.add(solvable)
+      if (sol.solvable) {
+//        val main = comp.getClassByName(nameParameter.toString).get
+//        val solvable = Java("SolvableSolitaire").tpe.asClassOrInterfaceType()
+//        main.getImplementedTypes.add(solvable)
+        comp.getClassByName(nameParameter.toString).get
+          .getImplementedTypes
+          .add(Java("SolvableSolitaire").tpe.asClassOrInterfaceType)
       }
 
       comp
@@ -246,7 +334,7 @@ trait GameTemplate extends Base with Controller with Initialization with Semanti
     * Helper code for various needs are placed in here as static methods.
     */
   @combinator object CreateHelper {
-    def apply(pkgName: Name, name: SimpleName, methods:Seq[MethodDeclaration]): CompilationUnit= {
+    def apply(pkgName: Name, name: SimpleName, methods:Seq[BodyDeclaration[_]]): CompilationUnit= {
 
       combinators.java.ConstraintHelper.render(pkgName, name, methods).compilationUnit()
     }

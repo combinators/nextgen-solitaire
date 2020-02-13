@@ -1,57 +1,77 @@
 package org.combinators.solitaire.klondike
 
 import javax.inject.Inject
-
 import com.github.javaparser.ast.CompilationUnit
 import org.combinators.cls.interpreter.ReflectedRepository
-import org.combinators.cls.types.syntax._
-import org.combinators.cls.git.{EmptyResults, InhabitationController, Results}
+import org.combinators.cls.git._
+import org.combinators.solitaire.domain.Solitaire
+import org.combinators.solitaire.shared.cls.Synthesizer
 import org.combinators.templating.persistable.JavaPersistable._
 import org.webjars.play.WebJarsUtil
 import play.api.inject.ApplicationLifecycle
 
-// domain
-import domain._
 
-class Klondike @Inject()(webJars: WebJarsUtil, applicationLifecycle: ApplicationLifecycle) extends InhabitationController(webJars, applicationLifecycle) {
+abstract class KlondikeVariationController(web: WebJarsUtil, app: ApplicationLifecycle)
+  extends InhabitationController(web, app) with RoutingEntries {
 
-  /** Defined in Game trait. */
-//  lazy val repositoryPre = new game {}
-//  lazy val GammaPre = ReflectedRepository(repositoryPre, classLoader = this.getClass.getClassLoader)
-//
-//  lazy val reply:InhabitationResult[Solitaire] = GammaPre.inhabit[Solitaire]('Variation('Klondike))
-//  lazy val it:Iterator[Solitaire] = reply.interpretedTerms.values.flatMap(_._2).iterator
-//  lazy val s:Solitaire = it.next()
+  // request a specific variation via "http://localhost:9000/klondike/SUBVAR-NAME
+  val variation: Solitaire // klondike.KlondikeDomain
 
-  val s:Solitaire = new domain.klondike.Domain()
+  /** KlondikeDomain for Klondike defined herein. Controllers are defined in Controllers area. */
+  lazy val repository = new KlondikeDomain(variation) with controllers {}
 
-  /** Domain for Klondike defined herein. Controllers are defined in Controllers area. */
-  lazy val repository = new KlondikeDomain(s) with controllers {}
-  import repository._
-  lazy val Gamma = repository.init(ReflectedRepository(repository, classLoader = this.getClass.getClassLoader), s)
-
+  lazy val Gamma = repository.init(ReflectedRepository(repository, classLoader = this.getClass.getClassLoader), variation)
   lazy val combinatorComponents = Gamma.combinatorComponents
-  lazy val jobs = Gamma.InhabitationBatchJob[CompilationUnit](game(complete))
-    .addJob[CompilationUnit](constraints(complete))
-    .addJob[CompilationUnit](controller(buildablePile, complete))
-    .addJob[CompilationUnit](controller(pile, complete))
-    .addJob[CompilationUnit](controller(deck, complete))
-    .addJob[CompilationUnit](controller('WastePile, complete))
-    .addJob[CompilationUnit]('WastePileClass)
-    .addJob[CompilationUnit]('WastePileViewClass)
-//
-    .addJob[CompilationUnit](move('MoveColumn :&: move.generic, complete))
-    .addJob[CompilationUnit](move('DealDeck :&: move.generic, complete))
-    .addJob[CompilationUnit](move('ResetDeck :&: move.generic, complete))
-    .addJob[CompilationUnit](move('FlipCard :&: move.generic, complete))
-    .addJob[CompilationUnit](move('MoveCard :&: move.generic, complete))
-    .addJob[CompilationUnit](move('BuildFoundation :&: move.generic, complete))
-    .addJob[CompilationUnit](move('BuildFoundationFromWaste :&: move.generic, complete))
 
-    .addJob[CompilationUnit](move('MoveColumn :&: move.potentialMultipleMove, complete))
+  val targets = Synthesizer.allTargets(variation)
+  lazy val results:Results =
+    EmptyInhabitationBatchJobResults(Gamma).addJobs[CompilationUnit](targets).compute()
 
-  //      .addJob[CompilationUnit]('Controller('Column))
+  override val routingPrefix = Some("klondike")
+  val controllerAddress: String = variation.name.toLowerCase
+}
 
-  lazy val results:Results = EmptyResults().addAll(jobs.run())
+class KlondikeController @Inject()(webJars: WebJarsUtil, applicationLifecycle: ApplicationLifecycle)
+  extends KlondikeVariationController(webJars, applicationLifecycle) {
+  lazy val variation = klondike // new klondike.KlondikeDomain
+}
 
+class WhiteheadController @Inject()(webJars: WebJarsUtil, applicationLifecycle: ApplicationLifecycle)
+  extends KlondikeVariationController(webJars, applicationLifecycle) {
+  lazy val variation = klondike // new klondike.Whitehead
+}
+
+class EastcliffController @Inject()(webJars: WebJarsUtil, applicationLifecycle: ApplicationLifecycle)
+  extends KlondikeVariationController(webJars, applicationLifecycle) {
+  lazy val variation = klondike // new klondike.EastCliff
+}
+
+class SmallHarpController @Inject()(webJars: WebJarsUtil, applicationLifecycle: ApplicationLifecycle)
+  extends KlondikeVariationController(webJars, applicationLifecycle) {
+  lazy val variation = klondike // new klondike.SmallHarp
+}
+
+class ThumbAndPouchController @Inject()(webJars: WebJarsUtil, applicationLifecycle: ApplicationLifecycle)
+  extends KlondikeVariationController(webJars, applicationLifecycle) {
+  lazy val variation = klondike // new klondike.ThumbAndPouchKlondikeDomain
+}
+
+class DealByThreeController @Inject()(webJars: WebJarsUtil, applicationLifecycle: ApplicationLifecycle)
+  extends KlondikeVariationController(webJars, applicationLifecycle) {
+  lazy val variation = klondike // new klondike.DealByThreeKlondikeDomain
+}
+
+class EastHavenController @Inject()(webJars: WebJarsUtil, applicationLifecycle: ApplicationLifecycle)
+  extends KlondikeVariationController(webJars, applicationLifecycle) {
+  lazy val variation = klondike //  new klondike.EastHaven
+}
+
+class DoubleEastHavenController @Inject()(webJars: WebJarsUtil, applicationLifecycle: ApplicationLifecycle)
+  extends KlondikeVariationController(webJars, applicationLifecycle) {
+  lazy val variation = klondike //  new klondike.DoubleEastHaven
+}
+
+class TripleEastHavenController @Inject()(webJars: WebJarsUtil, applicationLifecycle: ApplicationLifecycle)
+  extends KlondikeVariationController(webJars, applicationLifecycle) {
+  lazy val variation = klondike // new klondike.TripleEastHaven
 }

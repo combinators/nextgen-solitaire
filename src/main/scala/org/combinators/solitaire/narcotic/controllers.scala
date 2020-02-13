@@ -10,21 +10,21 @@ import org.combinators.solitaire.shared._
 import org.combinators.solitaire.shared
 import org.combinators.cls.interpreter.ReflectedRepository
 import org.combinators.generic
-import domain._
+import org.combinators.solitaire.domain._
+import org.combinators.solitaire.domain.WinningLogic
 
 trait controllers extends shared.Controller with GameTemplate with WinningLogic with shared.Moves with generic.JavaCodeIdioms {
 
   // dynamic combinators added as needed
-  override def init[G <: SolitaireDomain](gamma: ReflectedRepository[G], s: Solitaire):
+  override def init[G <: SolitaireDomain](narcotic: ReflectedRepository[G], s: Solitaire):
   ReflectedRepository[G] = {
-    var updated = super.init(gamma, s)
+    var updated = super.init(narcotic, s)
     println(">>> Narcotic Controller dynamic combinators.")
 
     updated = createMoveClasses(updated, s)
-
     updated = createDragLogic(updated, s)
-
     updated = generateMoveLogic(updated, s)
+    updated = generateExtendedClasses(updated, s)
 
     // Must determine how to handle clicks
     updated = updated

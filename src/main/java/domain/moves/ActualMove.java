@@ -5,6 +5,7 @@ import domain.Container;
 import domain.Element;
 import domain.Move;
 import domain.constraints.AndConstraint;
+import domain.constraints.Falsehood;
 import domain.constraints.Truth;
 
 import java.util.Iterator;
@@ -18,7 +19,7 @@ import java.util.Optional;
  * constraints/properties on the card(s) to be allowed to move between
  * them.
  *  
- * Domain modeling captures the semantic meaning of the moves, but relies
+ * KlondikeDomain modeling captures the semantic meaning of the moves, but relies
  * on regular programming to turn the logic into actual statements. For 
  * example, you can record that "a column of cards can be moved if the
  * column is descending in rank and contains alternating colors" but you 
@@ -37,12 +38,6 @@ import java.util.Optional;
  * Moves can be associated with individual elements or with an entire
  * container, which is a sort of short-cut to specifying each of the
  * available moves.
- * 
- * TODO: Create two sets of constraints (sourceConstraint for applicability
- * TODO: on the source, and targetConstraint for applicability on the target).
- * TODO: The source constraint would be used to synthesize press controllers
- * TODO: The target constraint would be used to synthesize release controllers
- * TODO: Moves with no target would be press controller logic
  *
  * TODO: Move might also be useful to have placeholder for extra statements to
  * TODO: Execute (both during move and during undo, which makes this complex).
@@ -61,10 +56,10 @@ public abstract class ActualMove implements Move {
    final Container targetContainer;
 
    /** There may be a valid constraint at the source of a move. */
-   final Constraint sourceConstraint;
+   Constraint sourceConstraint;
 
    /** There may be a valid constraint at the target of a move. */
-   final Constraint targetConstraint;
+   Constraint targetConstraint;
 
 
    /**
@@ -137,7 +132,7 @@ public abstract class ActualMove implements Move {
    }
 
    /** Get the target element of this move type. */
-   public final Element   getTarget() {
+   public final Element getTarget() {
       if (targetContainer == null) { return null; }
 
       Iterator<Element> it = targetContainer.iterator();
@@ -162,4 +157,36 @@ public abstract class ActualMove implements Move {
       return Optional.of(targetContainer);
    }
 
+   /**
+    * Deny move from being feasible.
+    */
+   public void prevent() {
+      this.sourceConstraint = new Falsehood();
+      this.targetConstraint = new Falsehood();
+   }
+
+
+//
+//   /**
+//    * Two ActualMove objects are the same if they have the same name.
+//    *
+//    * @param o  potential comparator object.
+//    * @return true if the Move objects have the same name.
+//    */
+//   @Override
+//   public boolean equals(Object o) {
+//      if (o == null) { return false; }
+//
+//      if (o instanceof Move) {
+//         Move other = (Move) o;
+//         return other.getName().equals(getName());
+//      }
+//
+//      return super.equals(o);
+//   }
+//
+//   @Override
+//   public int hashCode() {
+//      return getName().hashCode();
+//   }
 }

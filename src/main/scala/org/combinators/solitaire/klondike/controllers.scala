@@ -9,7 +9,8 @@ import org.combinators.cls.interpreter.{ReflectedRepository, combinator}
 import org.combinators.cls.types.{Constructor, Type}
 import org.combinators.templating.twirl.Java
 import org.combinators.generic
-import domain._
+import org.combinators.solitaire.domain._
+import org.combinators.solitaire.domain.WinningLogic
 
 trait controllers extends shared.Controller with shared.Moves with GameTemplate with WinningLogic with generic.JavaCodeIdioms with SemanticTypes  {
 
@@ -19,32 +20,50 @@ trait controllers extends shared.Controller with shared.Moves with GameTemplate 
     println (">>> Klondike Controller dynamic combinators.")
 
     updated = createMoveClasses(updated, s)
-
     updated = createDragLogic(updated, s)
-
     updated = generateMoveLogic(updated, s)
+    updated = generateExtendedClasses(updated, s)
 
-    // these all have to do with GUI commands being ignored
-    updated = updated
-      .addCombinator (new IgnoreClickedHandler(buildablePile))
-      .addCombinator (new IgnoreClickedHandler(pile))
-      .addCombinator (new IgnorePressedHandler(pile))
-      .addCombinator (new IgnoreClickedHandler('WastePile))
-      .addCombinator (new IgnoreReleasedHandler('WastePile))
+    // these all have to do with GUI commands being ignored. Note we can envision an alternate
+    // set of default behaviors to try to generate all possible moves to the Foundation,
+    // should one exist.
+    s.structure.foreach(ctPair => {
+      updated = updated.addCombinator(new IgnoreClickedHandler(Constructor(ctPair._2.head.name)))
 
-    updated = updated
-      .addCombinator (new IgnoreReleasedHandler(deck))
-      .addCombinator (new IgnoreClickedHandler(deck))
+      // In Klondike, it is never possible to release on the Deck or the wastepiles.
+      // can't release on the Deck.
+      // can't initiate from the Foundation. This could be generic code to add for many variations
+      ctPair._1 match {
+        case Waste => updated = updated.addCombinator(new IgnoreClickedHandler(Constructor(ctPair._2.head.name)))
+        case StockContainer => updated = updated.addCombinator(new IgnoreReleasedHandler(Constructor(ctPair._2.head.name)))
+        case Foundation => updated = updated.addCombinator(new IgnorePressedHandler(Constructor(ctPair._2.head.name)))
+        case _ =>
+      }
+    })
 
     // these clarify the allowed moves
     updated = updated
       .addCombinator (new deckPress.DealToTableauHandlerLocal())
-      .addCombinator (new deckPress.ResetDeckLocal())
-      .addCombinator (new SingleCardMoveHandler('WastePile))
+      .addCombinator (new SingleCardMoveHandler(wastePile))
+      .addCombinator (new SingleCardMoveHandler(fanPile))    // Variation
       .addCombinator (new buildablePilePress.CP2())
+
+    // TODO: FIX WITH PROPER MODELING
+    // Some variations allow you to reset deck, others don't; note if numRedeals is a positive number, then
+    // we can deal with that dynamically via state.
+//    if (s.asInstanceOf[klondike.KlondikeDomain].numRedeals() == klondike.VariationPoints.NEVER_REDEAL) {
+//      updated = updated.addCombinator (new deckPress.SkipResetDeckLocal())
+//    } else {
+      updated = updated.addCombinator (new deckPress.ResetDeckLocal())
+//    }
 
     updated = createWinLogic(updated, s)
 
+    // needed for DealByThree variation. Would love to be able to separate these out better.
+
+    //    @combinator object MakeFanPile extends ExtendModel("Column", "FanPile", 'FanPileClass)
+    //    @combinator object MakeWastePile extends ExtendModel("Pile", "WastePile", 'WastePileClass)
+    //    @combinator object MakeWastePileView extends ExtendView("View", "WastePileView", "WastePile", 'WastePileViewClass)
 
     // move these to shared area
     updated = updated
@@ -118,6 +137,16 @@ trait controllers extends shared.Controller with shared.Moves with GameTemplate 
     val semanticType: Type = drag(drag.variable, drag.ignore) =>: controller(deck1, controller.pressed)
   }
 
+    /** When deck is empty but variation has decided not able to reset deck. */
+    // This should be generated from one of the rules.
+    class SkipResetDeckLocal() {
+      def apply():(SimpleName, SimpleName) => Seq[Statement] = (widget,ignore) =>{
+        Java(s"""|{/* No reset deck available */}""".stripMargin).statements()
+      }
+
+      val semanticType: Type = drag(drag.variable, drag.ignore) =>: controller(deck2, controller.pressed)
+    }
+
   /** When deck is empty and must be reset from waste pile. */
   // This should be generated from one of the rules.
   class ResetDeckLocal() {
@@ -144,6 +173,8 @@ trait controllers extends shared.Controller with shared.Moves with GameTemplate 
 
   @combinator object ChainTogether extends deckPress.ChainTogether
 
+//  @combinator object MakeWastePile extends ExtendModel("Pile", "WastePile", 'WastePileClass)
+//  @combinator object MakeWastePileView extends ExtendView("View", "WastePileView", "WastePile", 'WastePileViewClass)
 
 }
 
