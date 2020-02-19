@@ -2,7 +2,9 @@ language: scala
 
 jdk: openjdk8
 
-script:
+before_script:
    - sbt "compile"
    - sbt "run"
+
+script:
    - sbt "runMain buildTest.TestSynthesisConvert"
