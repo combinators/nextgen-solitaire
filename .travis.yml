@@ -4,7 +4,7 @@ jdk: openjdk8
 
 before_script:
    - sbt "compile"
-   - sbt "run"
+   - sbt ++$TRAVIS_SCALA_VERSION -Dfile.encoding=UTF8 -J-XX:ReservedCodeCacheSize=256M -J-Xms1024M run
 
 script:
    - sbt "runMain buildTest.TestSynthesisConvert"
