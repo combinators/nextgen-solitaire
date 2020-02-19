@@ -1,8 +1,12 @@
-matrix:
-   include:
-       - language: scala
-         jdk: openjdk8
-         script:
-         - sbt compile
-         - sbt run
-         - sbt runMain buildTest.TestSynthesisConvert
+language: scala
+
+jdk: openjdk8
+
+env:
+   matrix:
+   - TEST_COMMAND="run"
+   - TEST_COMMAND="runMain buildTest.TestSynthesisConvert"
+
+script:
+   - sbt compile
+   - sbt "$TEST_COMMAND"
