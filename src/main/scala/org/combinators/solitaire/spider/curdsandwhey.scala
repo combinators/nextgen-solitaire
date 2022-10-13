@@ -1,9 +1,10 @@
 package org.combinators.solitaire
 
-import org.combinators.solitaire.domain._
 import org.combinators.solitaire.spider.variationPoints
-
-
+import org.combinators.solitaire.domain._
+import org.combinators.solitaire.shared.compilation.constraintCodeGenerators
+//org/combinators/solitaire/shared/compilation/constraints.scala
+//CodeGeneratorRegistry
 package object curdsandwhey extends variationPoints {
 
   override def numTableau: Int = 13
@@ -39,9 +40,10 @@ package object curdsandwhey extends variationPoints {
     val isEmpty = IsEmpty(Destination)
     val suit = AllSameSuit(cards)
     val rank = AllSameRank(cards)
+    val single = IsSingle(cards)
     val suitBuild = AndConstraint(NextRank(topDestination, bottomMoving, wrapAround=true), SameSuit(topDestination, bottomMoving))
 
-    val sr_xor = OrConstraint(AndConstraint(suit, NotConstraint(rank)), AndConstraint(NotConstraint(suit), rank))
+    val sr_xor = OrConstraint(AndConstraint(suit, NotConstraint(rank)), AndConstraint(NotConstraint(suit), rank),single) //add constraint to or for 1 card
 
     IfConstraint(isEmpty, IsKing(bottomMoving),
       AndConstraint(sr_xor,
