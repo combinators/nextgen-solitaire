@@ -1,5 +1,6 @@
 package org.combinators.solitaire
 
+import org.combinators.solitaire.baby.PrepareTableauToFoundation.{sourceElement, targetElement}
 import org.combinators.solitaire.domain._
 import org.combinators.solitaire.spider.closedVariationPoints
 import org.combinators.templating.twirl.Java
@@ -35,7 +36,7 @@ package object baby extends closedVariationPoints {
 
     AndConstraint( descend, OrConstraint(isEmpty, NextRank(topDestination, bottomMoving, wrapAround=true)) )
   }
-
+/*
   case object PrepareTableauToFoundation extends Setup {
 
     val sourceElement: ElementInContainer = ElementInContainer(Tableau, 0)
@@ -44,14 +45,67 @@ package object baby extends closedVariationPoints {
     // clear Foundation, and place [2C, AC] on 0th tableau
     val setup:Seq[SetupStep] = Seq(
       RemoveStep(sourceElement),
-      InitializeStep(targetElement.get, CardCreate(Hearts, Ace)),
+      InitializeStep(targetElement.get, CardCreate(Hearts, Three)),
       InitializeStep(targetElement.get, CardCreate(Hearts, Two)),
+      MovingCardsStep(Seq(CardCreate(Hearts,Ace)))
     )
 
     // Note: The premise behind falsifiedTest() is flawed. Specifically, given a condition
     // that is OR(c1, c2) and if you attempt to falsify with OR(not c1, c2) to demonstrate
     // an error, it could still succeed, because of c2. So we are only going to work on
     // positive test cases, to validate that a move works.
+  }
+*/
+//nothing goes to tableau so why is this a test?
+
+  case object SameSuit extends Setup {
+    val sourceElement = ElementInContainer(Tableau, 1)
+    val targetElement = Some(ElementInContainer(Tableau, 2))
+
+    val setup: Seq[SetupStep] = Seq(
+      RemoveStep(sourceElement),
+      RemoveStep(targetElement.get),
+      InitializeStep(targetElement.get, CardCreate(Hearts, Three)),
+      InitializeStep(targetElement.get, CardCreate(Hearts, Two)),
+      MovingCardsStep(Seq(CardCreate(Hearts, Ace)))
+    )
+  }
+
+  case object DifferentSuit extends Setup {
+    val sourceElement = ElementInContainer(Tableau, 1)
+    val targetElement = Some(ElementInContainer(Tableau, 2))
+
+    val setup: Seq[SetupStep] = Seq(
+      RemoveStep(sourceElement),
+      RemoveStep(targetElement.get),
+      InitializeStep(targetElement.get, CardCreate(Hearts, Three)),
+      InitializeStep(targetElement.get, CardCreate(Hearts, Two)),
+      MovingCardsStep(Seq(CardCreate(Clubs, Ace)))
+    )
+  }
+
+  case object TableauToEmptyTableauMultipleCards extends Setup {
+    val sourceElement = ElementInContainer(Tableau, 1)
+    val targetElement = Some(ElementInContainer(Tableau, 2))
+
+    val setup: Seq[SetupStep] = Seq(
+      RemoveStep(sourceElement),
+      RemoveStep(targetElement.get),
+      MovingCardsStep(Seq(CardCreate(Clubs, Three), CardCreate(Diamonds, Two)))
+      // MovingCardsStep(Seq(CardCreate(Clubs, Eight), CardCreate(Diamonds, Seven)))
+    )
+  }
+
+  case object TableauToEmptyTableau extends Setup {
+    val sourceElement = ElementInContainer(Tableau, 1)
+    val targetElement = Some(ElementInContainer(Tableau, 2))
+
+    val setup: Seq[SetupStep] = Seq(
+      RemoveStep(sourceElement),
+      RemoveStep(targetElement.get),
+      MovingCardsStep(Seq(CardCreate(Clubs, Three)))
+      // MovingCardsStep(Seq(CardCreate(Clubs, Eight), CardCreate(Diamonds, Seven)))
+    )
   }
 
   val baby:Solitaire = {
@@ -62,7 +116,7 @@ package object baby extends closedVariationPoints {
       specializedElements = Seq.empty,
       moves = Seq(tableauToTableauMove, tableauToFoundationMove, deckDealMove, flipMove),
       logic = BoardState(Map(Foundation -> 52)),
-      customizedSetup = Seq(PrepareTableauToFoundation)
+      customizedSetup = Seq(/*PrepareTableauToFoundation, */SameSuit, DifferentSuit, TableauToEmptyTableau, TableauToEmptyTableauMultipleCards)
     )
   }
 }
