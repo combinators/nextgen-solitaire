@@ -1,6 +1,6 @@
 package org.combinators.solitaire
 
-import org.combinators.solitaire.baby.PrepareTableauToFoundation.{sourceElement, targetElement}
+//import org.combinators.solitaire.baby.PrepareTableauToFoundation.{sourceElement, targetElement}
 import org.combinators.solitaire.domain._
 import org.combinators.solitaire.spider.closedVariationPoints
 import org.combinators.templating.twirl.Java
@@ -9,8 +9,10 @@ import org.combinators.templating.twirl.Java
 package object baby extends closedVariationPoints {
 
   override def numTableau: Int = 8
-  override def numFoundation: Int = 4
+  override def numFoundation: Int = 1
   override def numStock: Int = 1
+
+
 
   override def getDeal: Seq[DealStep] = {
     var colNum: Int = 1
@@ -107,6 +109,11 @@ package object baby extends closedVariationPoints {
       // MovingCardsStep(Seq(CardCreate(Clubs, Eight), CardCreate(Diamonds, Seven)))
     )
   }
+  //TODO: Hack replace generated logic for do with own
+
+  //val tableauRemove: Move = RemoveMultipleCardsMove("RemoveAllCards", Press, source = (Tableau,Descending(Source)), target = None)
+
+  val tableauRemove: Move = RemoveStackMove("RemoveAllCards",Press,source = (Tableau,AndConstraint(Descending(Destination),IsAce(TopCardOf(Destination)),IsKing(BottomCardOf(Destination)))), target = None)
 
   val baby:Solitaire = {
     Solitaire(name = "Baby",
@@ -114,9 +121,9 @@ package object baby extends closedVariationPoints {
       layout = Layout(map),
       deal = getDeal,
       specializedElements = Seq.empty,
-      moves = Seq(tableauToTableauMove, tableauToFoundationMove, deckDealMove, flipMove),
+      moves = Seq(tableauToTableauMove, tableauToFoundationMove, deckDealMove, flipMove, tableauRemove),
       logic = BoardState(Map(Foundation -> 52)),
-      customizedSetup = Seq(/*PrepareTableauToFoundation, */SameSuit, DifferentSuit, TableauToEmptyTableau, TableauToEmptyTableauMultipleCards)
+      customizedSetup = Seq(SameSuit, DifferentSuit, TableauToEmptyTableau, TableauToEmptyTableauMultipleCards),
     )
   }
 }

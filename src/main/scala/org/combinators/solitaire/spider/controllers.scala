@@ -126,9 +126,14 @@ trait controllers extends shared.Controller with GameTemplate with WinningLogic 
     */
   class DealToTableauHandlerLocal() {
     def apply(): (SimpleName, SimpleName) => Seq[Statement] = (widget, ignore) => {
-      Java(s"""|{Move m = new DealDeck(theGame.deck, theGame.tableau);
+      Java(s"""|{
+               |Move rm = new RemoveAllCards(theGame.tableau);
+               |Move m = new DealDeck(theGame.deck, theGame.tableau);
                |if (m.doMove(theGame)) {
                |   theGame.pushMove(m);
+               |   if(rm.doMove(theGame)){
+               |   theGame.pushMove(rm);
+               |   }
                |   // have solitaire game refresh widgets that were affected
                |   theGame.refreshWidgets();
                |   return;
@@ -139,6 +144,37 @@ trait controllers extends shared.Controller with GameTemplate with WinningLogic 
     val semanticType: Type = drag(drag.variable, drag.ignore) =>: controller(deck, controller.pressed)
   }
 
+
 }
+
+/*
+
+class CombinedPileHandlerLocal {
+  def apply(): (SimpleName, SimpleName) => Seq[Statement] = {
+    (widgetVariableName: SimpleName, ignoreWidgetVariableName: SimpleName) =>
+      Java(s"""|$ignoreWidgetVariableName = false;
+               |Pile srcPile = (Pile) src.getModelElement();
+               |
+               |// Return in the case that the pile clicked on is empty
+               |if (srcPile.count() == 0) {
+               |  return;
+               |}
+               |// Deal with situation when all are the same.
+               |Move rm = new RemoveAllCards(theGame.tableau);
+               |if (rm.doMove(theGame)) {
+               |   theGame.pushMove(rm);
+               |   c.repaint();
+               |   return;
+               |}
+               |$widgetVariableName = src.getCardViewForTopCard(me);
+               |if ($widgetVariableName == null) {
+               |  return;
+               |}""".stripMargin).statements()
+  }
+
+  val semanticType: Type = drag(drag.variable, drag.ignore) =>: controller(pile, controller.pressed)
+}
+
+ */
 
 

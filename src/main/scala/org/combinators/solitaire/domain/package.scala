@@ -66,6 +66,13 @@ package object domain {
       source=source, target=target, isSingleDestination = false)
   }
 
+  def RemoveStackMove(name: String, gesture: GestureType,
+                              source: (ContainerType, Constraint),
+                              target: Option[(ContainerType, Constraint)]): Move = {
+    Move(name, RemoveStack, gesture, movableElement = Card,
+      source = source, target = target, isSingleDestination = false)
+  }
+
   val card_width:Int = 73
   val card_height:Int = 97
   val card_overlap:Int = 22 // visible distance in columns.
