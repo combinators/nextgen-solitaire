@@ -11,7 +11,7 @@ trait controllers extends DiscordTemplate  with SemanticTypes  {
     // dynamic combinators added as needed
     override def init[G <: DiscordDomain](gamma : ReflectedRepository[G], discord:Discord) :  ReflectedRepository[G] = {
       var updated = super.init(gamma, discord)
-      println(">>> Minimal Controller dynamic combinators.")
+      println(">>> Hello Controller dynamic combinators.")
 
      // override as you need to..
       updated = updated.addCombinator(new Description(discord.description))

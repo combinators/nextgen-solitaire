@@ -1,6 +1,5 @@
 package org.combinators.discord.hello
 
-
 import org.combinators.templating.persistable.PythonWithPath
 import org.combinators.templating.persistable.PythonWithPathPersistable._
 import org.combinators.cls.interpreter.ReflectedRepository
@@ -10,13 +9,13 @@ import org.combinators.discord.shared.compilation.{DefaultMain, DiscordSolution}
 
 trait HelloT extends DiscordSolution {
 
-  lazy val repository = new MinimalDomain(discord){}
+  lazy val repository = new HelloDomain(discord) with controllers {}
   import repository._
-  lazy val Gamma = repository.init(ReflectedRepository(repository, classLoader = this.getClass.getClassLoader), solitaire)
+  lazy val Gamma = repository.init(ReflectedRepository(repository, classLoader = this.getClass.getClassLoader), discord)
 
   lazy val combinatorComponents = Gamma.combinatorComponents
 
-  lazy val targets: Seq[Constructor] = Seq(game(complete))
+  lazy val targets: Seq[Constructor] = Seq(bot(complete))
   lazy val jobs =
     Gamma.InhabitationBatchJob[PythonWithPath](targets.head)    // Why just singular target here?
 
@@ -24,6 +23,6 @@ trait HelloT extends DiscordSolution {
 }
 
 // Match the Trait with multi card moves with the model that defines multi card moves
-object HelloDisocrdMain extends DefaultMain with HelloT {
-  override lazy val discord = org.combinators.solitaire.minimal.minimalS
+object HelloDiscordMain extends DefaultMain with HelloT {
+  override lazy val discord = org.combinators.discord.hello.hello
 }

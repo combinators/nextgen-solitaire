@@ -11,7 +11,7 @@ import pydiscord.shared.DiscordTemplate
 /**
  * @param solitaire    Application domain object with details about solitaire variation.
  */
-class MinimalDomain(val d:Discord) extends DiscordDomain(d) with DiscordTemplate with SemanticTypes {
+class HelloDomain(val d:Discord) extends DiscordDomain(d) with DiscordTemplate with SemanticTypes {
 
 
 }

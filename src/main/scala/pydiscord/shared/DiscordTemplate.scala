@@ -30,7 +30,7 @@ trait DiscordTemplate extends Base with SemanticTypes {
       str
     }
 
-    val semanticType:Type = discord(discord.description)
+    val semanticType:Type = bot(bot.description)
   }
 
   // instantiate THIS
@@ -39,12 +39,12 @@ trait DiscordTemplate extends Base with SemanticTypes {
       str
     }
 
-    val semanticType:Type = discord(discord.prefix)
+    val semanticType:Type = bot(bot.prefix)
   }
 
   class OutputFile(str:String) {
     def apply: String = str
-    val semanticType:Type = discord(discord.fileName)
+    val semanticType:Type = bot(bot.fileName)
   }
 
   class MakeMain(disc:Discord) {
@@ -87,7 +87,6 @@ trait DiscordTemplate extends Base with SemanticTypes {
                    |""".stripMargin)
       PythonWithPath(code, Paths.get(fileName + ".py"))
     }
-    val semanticType:Type = discord(discord.fileName) =>: discord(discord.description) =>: discord(discord.prefix)
-      discord(complete)
+    val semanticType:Type = bot(bot.fileName) =>: bot(bot.description) =>: bot(bot.prefix) =>: bot(complete)
   }
 }

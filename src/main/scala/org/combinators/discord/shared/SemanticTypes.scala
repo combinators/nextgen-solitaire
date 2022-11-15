@@ -20,8 +20,8 @@ trait SemanticTypes {
   }
 
   /** only one part since synthesizing 'the' game. */
-  object discord {
-    def apply(part: Type): Constructor = 'Game(part)
+  object bot {
+    def apply(part: Type): Constructor = 'Bot(part)
 
     val prefix: Type = 'Prefix
     val description: Type = 'Description
