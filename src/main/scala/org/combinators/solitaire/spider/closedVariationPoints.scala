@@ -1,5 +1,6 @@
 package org.combinators.solitaire.spider
 
+import org.combinators.solitaire.spider.variationPoints
 import org.combinators.solitaire.domain._
 
 /** Additional shared code for spider variations with face-down cards

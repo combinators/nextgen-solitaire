@@ -1,11 +1,15 @@
 package org.combinators.solitaire.castle
-
 import org.combinators.cls.interpreter._
 import org.combinators.solitaire.domain.{Foundation, Tableau}
 import org.combinators.solitaire.shared.SolitaireDomainTest
 import org.scalatest.FunSpec
 
+
 class CastleTests extends FunSpec {
+
+  describe("custom test ---------------------") {
+
+  }
   describe("The possible inhabited domain models") {
     val domainModel = castle
 

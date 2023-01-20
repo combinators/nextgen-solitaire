@@ -8,6 +8,8 @@ lazy val commonSettings = Seq(
 
   javacOptions ++= Seq("-source", "8"),
 
+  javaSource := baseDirectory.value / "target",
+
   scalaVersion := "2.12.4",
 
   resolvers ++= Seq(
@@ -33,6 +35,7 @@ lazy val commonSettings = Seq(
     "javax.xml.bind" % "jaxb-api" % "2.3.1",
     "ch.qos.logback" % "logback-classic" % "1.2.6",
     "com.typesafe.scala-logging" %% "scala-logging" % "3.9.4",
+
 
     guice
   )
@@ -64,4 +67,5 @@ lazy val root = (Project(id = "nextgen-solitaire", base = file(".")))
 
     PlayKeys.playMonitoredFiles ++= (sourceDirectories in (Compile, TwirlKeys.compileTemplates)).value
   )
+
 

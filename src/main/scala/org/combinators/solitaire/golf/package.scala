@@ -2,6 +2,8 @@ package org.combinators.solitaire
 
 import org.combinators.solitaire.domain._
 
+
+
 package object golf extends variationPoints{
   val golf:Solitaire = {
 

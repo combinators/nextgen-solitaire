@@ -43,6 +43,11 @@ trait controllers extends shared.Controller with GameTemplate with WinningLogic 
     updated = updated
       .addCombinator (new IgnoreClickedHandler(buildablePile))
 
+    if(s.name.equalsIgnoreCase("Baby")){
+      updated = updated
+        .addCombinator(new BuildablePileRelease())
+    }
+
 
     //determine if our variation needs the buildablePilePress controller
     //if(s.isInstanceOf[closedVariationPoints]){
@@ -59,12 +64,19 @@ trait controllers extends shared.Controller with GameTemplate with WinningLogic 
         .addCombinator (new buildablePilePress.CP2())
     }
 
+    //if (s.name.equalsIgnoreCase("Baby")) {
+      //updated = updated
+        //.addCombinator(new CombinedPileHandlerLocal())
+   // }
+
     updated = updated
       .addCombinator (new IgnoreClickedHandler(deck))
       .addCombinator (new IgnoreReleasedHandler(deck))
 
     updated = updated
       .addCombinator(new DealToTableauHandlerLocal())
+
+
 
     updated = createWinLogic(updated, s)
 
@@ -127,13 +139,9 @@ trait controllers extends shared.Controller with GameTemplate with WinningLogic 
   class DealToTableauHandlerLocal() {
     def apply(): (SimpleName, SimpleName) => Seq[Statement] = (widget, ignore) => {
       Java(s"""|{
-               |Move rm = new RemoveAllCards(theGame.tableau);
                |Move m = new DealDeck(theGame.deck, theGame.tableau);
                |if (m.doMove(theGame)) {
                |   theGame.pushMove(m);
-               |   if(rm.doMove(theGame)){
-               |   theGame.pushMove(rm);
-               |   }
                |   // have solitaire game refresh widgets that were affected
                |   theGame.refreshWidgets();
                |   return;
@@ -143,6 +151,74 @@ trait controllers extends shared.Controller with GameTemplate with WinningLogic 
 
     val semanticType: Type = drag(drag.variable, drag.ignore) =>: controller(deck, controller.pressed)
   }
+
+  class BuildablePileRelease() {
+    def apply(): Seq[Statement] =  {
+      Java(
+        s"""|{
+            |Column movingElement = (Column) w.getModelElement();
+            |BuildablePile toElement = (BuildablePile) src.getModelElement();
+            |// Get sourceWidget for card being dragged
+            |Widget sourceWidget = theGame.getContainer().getDragSource();
+            |// Identify the source
+            |BuildablePile sourceEntity = (BuildablePile) sourceWidget.getModelElement();
+            |// this is the actual move
+            |Move m = new MoveColumn(sourceEntity, movingElement, toElement);
+            |Move rm = new RemoveAllCards(toElement);
+            |if (m.valid(theGame)) {
+            |   m.doMove(theGame);
+            |   theGame.pushMove(m);
+            |   if(rm.valid(theGame)){
+            |     rm.doMove(theGame);
+            |     theGame.pushMove(rm);
+            |   }
+            |}
+            |}""".stripMargin
+      ).statements()
+    }
+
+    val semanticType: Type = controller(buildablePile, controller.released)
+  }
+  /*
+
+  Move m = new MoveColumn(sourceEntity, movingElement, toElement);
+                  Move rm = new RemoveAllCards(toElement);
+                  if (m.valid(theGame)) {
+                      m.doMove(theGame);
+                      theGame.pushMove(m);
+                      if(rm.valid(theGame)){
+                          rm.doMove(theGame);
+                          theGame.pushMove(rm);
+                      }
+  class CombinedPileHandlerLocal {
+    def apply(): (SimpleName, SimpleName) => Seq[Statement] = {
+      (widgetVariableName: SimpleName, ignoreWidgetVariableName: SimpleName) =>
+        Java(
+          s"""|$ignoreWidgetVariableName = false;
+              |Pile srcPile = (Pile) src.getModelElement();
+              |
+              |// Return in the case that the pile clicked on is empty
+              |if (srcPile.count() == 0) {
+              |  return;
+              |}
+              |// Deal with situation when all are the same.
+              |Move rm = new RemoveAllCards(theGame.tableau);
+              |if (rm.doMove(theGame)) {
+              |   theGame.pushMove(rm);
+              |   c.repaint();
+              |   return;
+              |}
+              |$widgetVariableName = src.getCardViewForTopCard(me);
+              |if ($widgetVariableName == null) {
+              |  return;
+              |}""".stripMargin).statements()
+    }
+
+    val semanticType: Type = drag(drag.variable, drag.ignore) =>: controller(pile, controller.pressed)
+  }
+
+
+   */
 
 
 }

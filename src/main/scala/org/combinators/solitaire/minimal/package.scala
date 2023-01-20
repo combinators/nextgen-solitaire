@@ -21,18 +21,20 @@ package object minimal {
   val deckDealMove:Move = DealDeckMove("DealDeck", 1,
     source=(StockContainer, NotConstraint(IsEmpty(Source))), target=Some((Tableau, Truth)))
 
-  def allowed(): Constraint = {
-    val topDestination = TopCardOf(Destination)
-    val isEmpty = IsEmpty(Destination)
 
-    OrConstraint(isEmpty, NextRank(topDestination, MovingCard))
-  }
 
   def allowedMT(): Constraint = {
     val topDestination = TopCardOf(Destination)
     val isEmpty = IsEmpty(Destination)
 
     OrConstraint(isEmpty, NextRank(topDestination, BottomCardOf(MovingCards)))
+  }
+
+  def allowed(): Constraint = {
+    val topDestination = TopCardOf(Destination)
+    val isEmpty = IsEmpty(Destination)
+
+    OrConstraint(isEmpty, NextRank(topDestination, MovingCard))
   }
 
   val tableauToTableauMove:Move = SingleCardMove("MoveCard", Drag,

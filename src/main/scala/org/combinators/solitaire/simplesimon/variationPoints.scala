@@ -72,8 +72,7 @@ trait variationPoints {
     source=(Tableau,Truth), target=Some((Tableau, buildOnTableau(MovingCards))))
 
   val tableauToFoundationMove:Move = MultipleCardsMove("MoveCardFoundation", Drag,
-    source=(Tableau,Truth), target=Some((Foundation, AndConstraint(
-      IsEmpty(Destination), buildOnFoundation(MovingCards)))))
+    source=(Tableau,Truth), target=Some((Foundation, AndConstraint(IsEmpty(Destination), buildOnFoundation(MovingCards)))))
 
   val allowed = AndConstraint(NotConstraint(IsEmpty(Source)),
     NotConstraint(IsFaceUp(TopCardOf(Source))))

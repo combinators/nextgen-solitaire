@@ -41,6 +41,8 @@ object SpideretteMain extends DefaultMain with SpiderVariationT {
   override lazy val solitaire = spiderette
 }
 
+
+
 object ScorpionMain extends DefaultMain with SpiderVariationT {
   override lazy val solitaire = scorpion
 }

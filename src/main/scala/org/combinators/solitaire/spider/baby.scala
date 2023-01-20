@@ -17,7 +17,6 @@ package object baby extends closedVariationPoints {
   override def getDeal: Seq[DealStep] = {
     var colNum: Int = 1
     var dealSeq: Seq[DealStep] = Seq() // doesn't like me declaring it without initializing
-    // Klondike deal - the ith pile gets i face down cards
     for (colNum <- 1 to 7) {
       dealSeq = dealSeq :+ DealStep(ElementTarget(Tableau, colNum), Payload(faceUp = false, numCards = colNum))
     }
@@ -115,6 +114,7 @@ package object baby extends closedVariationPoints {
 
   val tableauRemove: Move = RemoveStackMove("RemoveAllCards",Press,source = (Tableau,AndConstraint(Descending(Destination),IsAce(TopCardOf(Destination)),IsKing(BottomCardOf(Destination)))), target = None)
 
+
   val baby:Solitaire = {
     Solitaire(name = "Baby",
       structure = structureMap,
@@ -122,7 +122,7 @@ package object baby extends closedVariationPoints {
       deal = getDeal,
       specializedElements = Seq.empty,
       moves = Seq(tableauToTableauMove, tableauToFoundationMove, deckDealMove, flipMove, tableauRemove),
-      logic = BoardState(Map(Foundation -> 52)),
+      logic = BoardState(Map(Tableau -> 0, StockContainer -> 0)),
       customizedSetup = Seq(SameSuit, DifferentSuit, TableauToEmptyTableau, TableauToEmptyTableauMultipleCards),
     )
   }

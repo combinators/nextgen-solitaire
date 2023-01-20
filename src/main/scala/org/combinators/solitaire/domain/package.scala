@@ -70,7 +70,7 @@ package object domain {
                               source: (ContainerType, Constraint),
                               target: Option[(ContainerType, Constraint)]): Move = {
     Move(name, RemoveStack, gesture, movableElement = Card,
-      source = source, target = target, isSingleDestination = false)
+      source = source, target = target)
   }
 
   val card_width:Int = 73
