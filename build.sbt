@@ -65,3 +65,4 @@ lazy val root = (Project(id = "nextgen-solitaire", base = file(".")))
     PlayKeys.playMonitoredFiles ++= (sourceDirectories in (Compile, TwirlKeys.compileTemplates)).value
   )
 
+libraryDependencies += "junit" % "junit" % "4.13.2"

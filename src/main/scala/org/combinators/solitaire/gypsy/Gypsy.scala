@@ -36,7 +36,7 @@ object GypsyMain extends DefaultMain with GypsyVariationT {
   override lazy val solitaire = gypsy
 }
 
-object GiantMain extends DefaultMain with GypsyVariationT {
+  object GiantMain extends DefaultMain with GypsyVariationT {
   override lazy val solitaire = giant
 }
 

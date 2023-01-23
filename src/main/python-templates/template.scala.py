@@ -1,3 +1,6 @@
+from pysolfc.shared import Structure
+
+
 @(Structure:Python,Hilight:Python,Shufflehook:Python,CreateGameParams:Python,GameID:Python)
 
 # another try

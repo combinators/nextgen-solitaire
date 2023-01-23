@@ -22,14 +22,17 @@ trait SemanticTypes {
   /** only one part since synthesizing 'the' game. */
   object bot {
     def apply(part: Type): Constructor = 'Bot(part)
-
+    val libraries: Type ='Libraries
     val prefix: Type = 'Prefix
     val description: Type = 'Description
-
+    val commName: Type = 'CommName
+    val commArgs: Type = 'CommArgs
+    val commContent: Type = 'CommContent
     val fields: Type = 'Fields
     val methods: Type = 'Methods
     val imports: Type = 'Imports // Should be part of context...
-
+    val eventNames: Type = 'EventNames
+    val eventContents: Type = 'EventContents
     val fileName:Type = 'FileName
     val structure:Type = 'Structure
 
