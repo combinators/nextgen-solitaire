@@ -82,7 +82,7 @@ public class Domain extends Solitaire {
     }
 
     /**
-     * Default Tableau has ten columns, each with four cards
+     * tmp.Default Tableau has ten columns, each with four cards
      */
     protected Tableau getTableau() {
         if (tableau == null) {
@@ -93,7 +93,7 @@ public class Domain extends Solitaire {
     }
 
     /**
-     * Default Waste pile
+     * tmp.Default Waste pile
      */
     protected Waste getWaste() {
         if (waste == null) {

@@ -77,7 +77,7 @@ public class Domain extends Solitaire {
 
 
     /**
-     * Default Foundation has four piles..
+     * tmp.Default Foundation has four piles..
      *
      * @return
      */
@@ -90,7 +90,7 @@ public class Domain extends Solitaire {
     }
 
     /**
-     * Default Tableau has eight rows, four on left and four on right
+     * tmp.Default Tableau has eight rows, four on left and four on right
      *
      * @return
      */

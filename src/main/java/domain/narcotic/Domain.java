@@ -25,7 +25,7 @@ public class Domain extends Solitaire {
     private Stock stock;
 
     /**
-     * Default Klondike Tableau has seven buildable piles.
+     * tmp.Default Klondike Tableau has seven buildable piles.
      *
      * @return
      */
@@ -38,7 +38,7 @@ public class Domain extends Solitaire {
     }
 
     /**
-     * Default Klondike has a single Stock of a single deck of cards.
+     * tmp.Default Klondike has a single Stock of a single deck of cards.
      *
      * @return
      */

@@ -13,14 +13,14 @@ import domain.ui.PlacementGenerator;
 public class Stock extends Container {
 	public final int numDecks;
 
-	/** Default stock has single deck. */
+	/** tmp.Default stock has single deck. */
 	public Stock () {
 		super(SolitaireContainerTypes.Stock);
         this.numDecks = 1;
 		init();
 	}
 
-    /** Default stock has single deck. */
+    /** tmp.Default stock has single deck. */
     public Stock (int n) {
         super(SolitaireContainerTypes.Stock);
         this.numDecks = n;

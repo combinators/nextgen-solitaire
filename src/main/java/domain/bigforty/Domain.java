@@ -71,7 +71,7 @@ public class Domain extends Solitaire {
     }
 
     /**
-     * Default Foundation has four piles..
+     * tmp.Default Foundation has four piles..
      *
      * @return
      */
@@ -84,7 +84,7 @@ public class Domain extends Solitaire {
     }
 
     /**
-     * Default Waste has a single WastePile
+     * tmp.Default Waste has a single WastePile
      *
      * @return
      */

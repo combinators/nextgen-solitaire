@@ -63,7 +63,7 @@ public class KlondikeDomain extends Solitaire implements VariationPoints {
     private Deal deal;
 
     /**
-     * Default Klondike Tableau has seven buildable piles.
+     * tmp.Default Klondike Tableau has seven buildable piles.
      *
      * @return
      */
@@ -85,7 +85,7 @@ public class KlondikeDomain extends Solitaire implements VariationPoints {
     }
 
     /**
-     * Default Klondike Foundation has four Foundation piles.
+     * tmp.Default Klondike Foundation has four Foundation piles.
      *
      * @return
      */
@@ -99,7 +99,7 @@ public class KlondikeDomain extends Solitaire implements VariationPoints {
     }
 
     /**
-     * Default Klondike has a single Stock of a single deck of cards.
+     * tmp.Default Klondike has a single Stock of a single deck of cards.
      *
      * @return
      */

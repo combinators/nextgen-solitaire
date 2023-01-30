@@ -32,7 +32,7 @@ public class DoubleFreeCell extends FreeCellDomain {
 
 
     /**
-     * Default Reserve has five Free piles..
+     * tmp.Default Reserve has five Free piles..
      *
      * @return
      */
@@ -58,7 +58,7 @@ public class DoubleFreeCell extends FreeCellDomain {
     }
 
     /**
-     * Default Tableau has eight columns
+     * tmp.Default Tableau has eight columns
      *
      * @return
      */

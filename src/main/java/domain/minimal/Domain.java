@@ -40,7 +40,7 @@ public class Domain extends Solitaire {
     }
 
     /**
-     * Default Foundation has four Home piles..
+     * tmp.Default Foundation has four Home piles..
      *
      * @return
      */
@@ -53,7 +53,7 @@ public class Domain extends Solitaire {
     }
 
     /**
-     * Default Klondike has a single Stock of a single deck of cards.
+     * tmp.Default Klondike has a single Stock of a single deck of cards.
      *
      * @return
      */

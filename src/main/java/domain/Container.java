@@ -21,7 +21,7 @@ public class Container implements Iterable<Element> {
 	public final ContainerType type;
 
 	/**
-	 * Default constructor for subclasses (i.e., Stock) which may be present in the model
+	 * tmp.Default constructor for subclasses (i.e., Stock) which may be present in the model
 	 * but are not visible.
 	 *
 	 * Use this only for non-visible Containers (again, only likely for Stock)

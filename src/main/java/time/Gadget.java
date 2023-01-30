@@ -13,7 +13,7 @@ import java.util.Optional;
 public class Gadget implements Iterable<Feature> {
     final List<Feature> features = new ArrayList<>();
 
-    /** Default to one-second timer. */
+    /** tmp.Default to one-second timer. */
     public Gadget () {
         this (FrequencyUnit.Second);
     }

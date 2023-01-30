@@ -12,7 +12,7 @@ import org.combinators.solitaire.domain._
 
 trait Initialization extends SemanticTypes {
   /**
-    * Default initialization for a solitaire plugin requires initializing the
+    * tmp.Default initialization for a solitaire plugin requires initializing the
     * Model, View and then Control sections. Once done, then provide specific initialization
     * for the game (i.e., initial deal).
     */

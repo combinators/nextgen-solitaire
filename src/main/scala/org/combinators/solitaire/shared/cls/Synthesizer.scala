@@ -33,7 +33,7 @@ object Synthesizer extends JavaSemanticTypes {
     * Take out game(complete) since (for some unknown reason) I need to start with one already produced,
     * so sine this one is always present, we take it out
     *
-    * @return       Default Targets suitable for KombatSolitaire framework
+    * @return       tmp.Default Targets suitable for KombatSolitaire framework
     */
   def standardTargets() :Seq[Constructor] =
     Seq(game(complete),

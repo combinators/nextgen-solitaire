@@ -19,7 +19,7 @@ import domain.*;
  * Src x
  *
  *
- * Default as ignore.... once a Container is added to a UserInterface, 
+ * tmp.Default as ignore.... once a Container is added to a UserInterface,
  * then ignore registrations are inserted.
  */
 public class UserInterface {

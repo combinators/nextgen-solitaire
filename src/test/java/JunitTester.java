@@ -10,6 +10,7 @@ class JunitTester {
 
     @Test
     void testBaby(){
+        System.out.println("testerings");
         assertEquals(20,20);
     }
 }

@@ -3,7 +3,7 @@ package domain;
 import domain.constraints.MoveInformation;
 
 /**
- * Default types in the domain of solitaire.
+ * tmp.Default types in the domain of solitaire.
  *
  * To add new kinds of containers, just have an enum extend this interface
  *

@@ -34,7 +34,7 @@ case class Layout(places:Map[ContainerType, Seq[Widget]]) {
 
 trait WinningLogic { }
 
-/** Default logic is to hit a certain score. */
+/** tmp.Default logic is to hit a certain score. */
 case class ScoreAchieved(score:Int) extends WinningLogic
 
 case class BoardState(states:Map[ContainerType, Int]) extends WinningLogic

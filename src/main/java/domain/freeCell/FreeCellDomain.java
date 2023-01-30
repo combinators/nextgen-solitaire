@@ -71,7 +71,7 @@ public class FreeCellDomain extends Solitaire implements VariationPoints {
 	}
 
     /**
-     * Default Reserve has five Free piles..
+     * tmp.Default Reserve has five Free piles..
      *
      * @return
      */
@@ -84,7 +84,7 @@ public class FreeCellDomain extends Solitaire implements VariationPoints {
     }
 
     /**
-     * Default Foundation has four Home piles..
+     * tmp.Default Foundation has four Home piles..
      *
      * @return
      */
@@ -97,7 +97,7 @@ public class FreeCellDomain extends Solitaire implements VariationPoints {
     }
 
     /**
-     * Default Tableau has eight columns
+     * tmp.Default Tableau has eight columns
      *
      * @return
      */

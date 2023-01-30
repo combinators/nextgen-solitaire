@@ -33,7 +33,7 @@ trait Controller extends Base with shared.Moves with generic.JavaCodeIdioms with
     //Only print test cases if customized Setups are defined
     if(s.customizedSetup.nonEmpty){
       println("Test setup found for variation: " + s.name)
-      updated = updated.addCombinator(new SolitaireTestSuite(s))
+      updated = updated.addCombinator(new `SolitaireTestSuite`(s))
     }else{
       println("no setup found")
     }
