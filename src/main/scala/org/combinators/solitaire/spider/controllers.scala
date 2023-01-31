@@ -43,10 +43,10 @@ trait controllers extends shared.Controller with GameTemplate with WinningLogic 
     updated = updated
       .addCombinator (new IgnoreClickedHandler(buildablePile))
 
-    if(s.name.equalsIgnoreCase("Baby")){
-      updated = updated
-        .addCombinator(new BuildablePileRelease())
-    }
+//    if(s.name.equalsIgnoreCase("Baby")){
+//      updated = updated
+//        .addCombinator(new BuildablePileRelease())
+//    }
 
 
     //determine if our variation needs the buildablePilePress controller

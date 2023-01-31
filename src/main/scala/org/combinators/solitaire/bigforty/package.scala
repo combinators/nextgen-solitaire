@@ -50,7 +50,7 @@ package object bigforty {
       SameSuit(BottomCardOf(MovingCards), TopCardOf(Destination))))
 
   val buildFoundation:Move = MultipleCardsMove("BuildFoundation", Drag,
-    source=(Tableau, IsSingle(MovingCards)), target=Some((Foundation, tf_tgt)))
+    source=(Tableau, NotConstraint(IsEmpty(Source))), target=Some((Foundation, tf_tgt)))
 
   val wf_tgt =  IfConstraint(isEmpty,
      AndConstraint ( IsSingle(MovingCard), IsAce(MovingCard)),
@@ -87,7 +87,7 @@ package object bigforty {
       /** from element can infer ks.ViewWidget as well as Base Element. */
       specializedElements = Seq(WastePile),
 
-      /** All rules here. */
+      /** All rules here. ,*/
       moves = Seq(tableauToTableau,wasteToTableau,buildFoundation,buildFoundationFromWaste,deckDeal,deckReset),
 
       // fix winning logic
