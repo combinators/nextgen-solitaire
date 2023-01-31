@@ -24,14 +24,23 @@ trait controllers extends shared.Controller with GameTemplate with shared.Moves 
     // these all have to do with GUI commands being ignored. Note we can envision an alternate
     // set of default behaviors to try to generate all possible moves to the Foundation,
     // should one exist.
-    s.structure.foreach(ctPair => {
-      updated = updated.addCombinator(new IgnoreClickedHandler(Constructor(ctPair._2.head.name)))
 
-      ctPair._1 match {
-        case Foundation => updated = updated.addCombinator (new IgnorePressedHandler(Constructor(ctPair._2.head.name)))
-        case _ =>
-      }
-    })
+    // Must determine how to handle clicks
+    updated = updated
+      .addCombinator(new IgnoreClickedHandler('FreeCellPile))
+      .addCombinator(new IgnoreClickedHandler(column))
+      .addCombinator(new IgnoreClickedHandler(pile))
+
+
+// PERHAPS THIS DOESN'T WORK
+//    s.structure.foreach(ctPair => {
+//      updated = updated.addCombinator(new IgnoreClickedHandler(Constructor(ctPair._2.head.name)))
+//
+//      ctPair._1 match {
+//        case Foundation => updated = updated.addCombinator (new IgnorePressedHandler(Constructor(ctPair._2.head.name)))
+//        case _ =>
+//      }
+//    })
 
 
     // for the PRESS while the TARGET is the locus for the RELEASE.
@@ -40,9 +49,7 @@ trait controllers extends shared.Controller with GameTemplate with shared.Moves 
     updated = updated
 //      .addCombinator (new IgnorePressedHandler('HomePile))
 //      .addCombinator (new IgnoreClickedHandler('HomePile))
-      .addCombinator (new SingleCardMoveHandler('FreePile))
-      .addCombinator (new IgnoreClickedHandler('FreePile))
-//      .addCombinator (new IgnoreClickedHandler('Column))
+      .addCombinator (new SingleCardMoveHandler('FreeCellPile))
 
     updated = createWinLogic(updated, s)
 
