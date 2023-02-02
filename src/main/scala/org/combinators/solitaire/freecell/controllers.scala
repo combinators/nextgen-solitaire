@@ -27,9 +27,10 @@ trait controllers extends shared.Controller with GameTemplate with shared.Moves 
 
     // Must determine how to handle clicks
     updated = updated
-      .addCombinator(new IgnoreClickedHandler('FreeCellPile))
+      .addCombinator(new IgnoreClickedHandler('FreeCellPile))  // CRITICAL that name exactly matches Scala name of case object
       .addCombinator(new IgnoreClickedHandler(column))
       .addCombinator(new IgnoreClickedHandler(pile))
+
 
 
 // PERHAPS THIS DOESN'T WORK
@@ -47,8 +48,8 @@ trait controllers extends shared.Controller with GameTemplate with shared.Moves 
     // These are handling the PRESS events... SHOULD BE ABLE TO
     // INFER THESE FROM THE AVAILABLE MOVES
     updated = updated
-//      .addCombinator (new IgnorePressedHandler('HomePile))
-//      .addCombinator (new IgnoreClickedHandler('HomePile))
+      .addCombinator (new IgnorePressedHandler(pile))
+      .addCombinator(new SingleCardMoveHandler(pile))  // TRYING ANYTHING...
       .addCombinator (new SingleCardMoveHandler('FreeCellPile))
 
     updated = createWinLogic(updated, s)
