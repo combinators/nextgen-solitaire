@@ -34,32 +34,32 @@ trait FreeCellVariationT extends SolitaireSolution {
 }
 
 object FreeCellMain extends DefaultMain with FreeCellVariationT {
-  lazy val solitaire = freecell
+ lazy val solitaire = regular.freecell
 }
 
 // remaining ones below need updating! In particular, model the variations that are found in the
 // Java native solutions.
-class ChallengeFreeCellController @Inject()(webJars: WebJarsUtil, applicationLifecycle: ApplicationLifecycle)
-  extends InhabitationController(webJars, applicationLifecycle) with FreeCellVariationT {
-  lazy val solitaire = freecell //  new freeCell.ChallengeFreeCell
+object ChallengeFreeCellMain extends DefaultMain with FreeCellVariationT {
+  override lazy val routingPrefix: Option[String] = Some("challenge")
+  lazy val solitaire = challenge.challengeFreecell
 }
 
-class SuperChallengeFreeCellController @Inject()(webJars: WebJarsUtil, applicationLifecycle: ApplicationLifecycle)
-  extends InhabitationController(webJars, applicationLifecycle) with FreeCellVariationT {
-  lazy val solitaire = freecell //  new freeCell.SuperChallengeFreeCell
+object SuperChallengeFreeCellMain extends DefaultMain with FreeCellVariationT {
+  override lazy val routingPrefix: Option[String] = Some("superchallenge")
+  lazy val solitaire = superchallenge.superchallengeFreecell
 }
 
-class ForeCellController @Inject()(webJars: WebJarsUtil, applicationLifecycle: ApplicationLifecycle)
-  extends InhabitationController(webJars, applicationLifecycle) with FreeCellVariationT {
-  lazy val solitaire = freecell //  new freeCell.ForeCell
+object ForeCellMain extends DefaultMain with FreeCellVariationT {
+  override lazy val routingPrefix: Option[String] = Some("forecell")
+  lazy val solitaire = forecell.forecell
 }
 
-class DoubleFreeCellController @Inject()(webJars: WebJarsUtil, applicationLifecycle: ApplicationLifecycle)
-  extends InhabitationController(webJars, applicationLifecycle) with FreeCellVariationT {
-  lazy val solitaire = freecell //  new freeCell.DoubleFreeCell
+object DoubleFreeCellMain extends DefaultMain with FreeCellVariationT {
+  override lazy val routingPrefix: Option[String] = Some("doublefreecell")
+  lazy val solitaire = doublefreecell.doubleFreecell
 }
 
-class StalactitesController @Inject()(webJars: WebJarsUtil, applicationLifecycle: ApplicationLifecycle)
-  extends InhabitationController(webJars, applicationLifecycle) with FreeCellVariationT {
-  lazy val solitaire = freecell //  new freeCell.DoubleFreeCell
-}
+//class StalactitesController @Inject()(webJars: WebJarsUtil, applicationLifecycle: ApplicationLifecycle)
+//  extends InhabitationController(webJars, applicationLifecycle) with FreeCellVariationT {
+//  lazy val solitaire = freecell //  new freeCell.DoubleFreeCell
+//}

@@ -17,7 +17,6 @@ import org.combinators.solitaire.shared.compilation.{CodeGeneratorRegistry, gene
 // to get the code to compile 
 class gameDomain(override val solitaire:Solitaire) extends SolitaireDomain(solitaire) with Controller with GameTemplate  {
 
-
   // TODO: Should be able to derive this from the modeling
   override def baseModelNameFromElement (e:Element): String = {
     e match {
@@ -364,16 +363,9 @@ class gameDomain(override val solitaire:Solitaire) extends SolitaireDomain(solit
            |        return v.elements();
            |}""".stripMargin).methodDeclarations()
 
-
       methods ++ solvableMoves
-
     }
     val semanticType: Type = game(game.methods :&: game.availableMoves)
   }
-
-//   @combinator object MakeHomePile extends ExtendModel("Pile", "HomePile", 'HomePileClass)
-//   @combinator object MakeFreePile extends ExtendModel("Pile", "FreePile", 'FreePileClass)
-//   @combinator object MakeHomePileView extends ExtendView("View", "HomePileView", "HomePile", 'HomePileViewClass)
-//   @combinator object MakeFreePileView extends ExtendView("View", "FreePileView", "FreePile", 'FreePileViewClass)
 
 }
