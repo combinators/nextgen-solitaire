@@ -14,7 +14,7 @@ trait KlondikeVariationT extends SolitaireSolution {
   lazy val Gamma = repository.init(ReflectedRepository(repository, classLoader = this.getClass.getClassLoader), solitaire)
   lazy val combinatorComponents = Gamma.combinatorComponents
 
-  val targets = Synthesizer.allTargets(solitaire)
+  lazy val targets = Synthesizer.allTargets(solitaire)
   lazy val results:Results =
     EmptyInhabitationBatchJobResults(Gamma).addJobs[CompilationUnit](targets).compute()
 

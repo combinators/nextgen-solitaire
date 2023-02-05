@@ -1,6 +1,6 @@
-package domain.freeCell;
+package pysolfc.freecell;
 
-import domain.*;
+import domain.Constraint;
 import domain.constraints.MoveInformation;
 
 /**
@@ -9,7 +9,7 @@ import domain.constraints.MoveInformation;
  *  empty column is destination
  *  empty column is the source (you just emptied it)
  */
-public class SufficientFree extends Constraint {
+ class SufficientFree extends Constraint {
 
     public final MoveInformation reserve;
     public final MoveInformation tableau;
@@ -17,7 +17,7 @@ public class SufficientFree extends Constraint {
     public final MoveInformation destination;
     public final MoveInformation column;
 
-    public SufficientFree (MoveInformation column, MoveInformation src, MoveInformation destination, MoveInformation reserve, MoveInformation tableau){
+    public SufficientFree(MoveInformation column, MoveInformation src, MoveInformation destination, MoveInformation reserve, MoveInformation tableau){
         this.reserve = reserve;
         this.tableau = tableau;
         this.src = src;

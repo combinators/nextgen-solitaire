@@ -1,15 +1,11 @@
 package org.combinators.solitaire.freecell
 
-import javax.inject.Inject
-import org.webjars.play.WebJarsUtil
 import com.github.javaparser.ast.CompilationUnit
 import org.combinators.cls.interpreter.ReflectedRepository
 import org.combinators.cls.git._
 import org.combinators.cls.types.Constructor
-import org.combinators.solitaire.domain.Solitaire
 import org.combinators.solitaire.shared.cls.Synthesizer
 import org.combinators.solitaire.shared.compilation.{DefaultMain, SolitaireSolution}
-import play.api.inject.ApplicationLifecycle
 import org.combinators.templating.persistable.JavaPersistable._
 /***
 abstract class FreeCellVariationController @Inject()(webJars: WebJarsUtil, applicationLifecycle: ApplicationLifecycle) extends InhabitationController(webJars, applicationLifecycle) with RoutingEntries  {
@@ -59,7 +55,7 @@ object DoubleFreeCellMain extends DefaultMain with FreeCellVariationT {
   lazy val solitaire = doublefreecell.doubleFreecell
 }
 
-//class StalactitesController @Inject()(webJars: WebJarsUtil, applicationLifecycle: ApplicationLifecycle)
-//  extends InhabitationController(webJars, applicationLifecycle) with FreeCellVariationT {
-//  lazy val solitaire = freecell //  new freeCell.DoubleFreeCell
-//}
+object StalactitesMain extends DefaultMain with FreeCellVariationT {
+  override lazy val routingPrefix: Option[String] = Some("stalactites")
+  lazy val solitaire = stalactites.stalactites
+}

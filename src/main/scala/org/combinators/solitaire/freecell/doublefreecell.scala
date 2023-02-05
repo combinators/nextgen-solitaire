@@ -62,7 +62,7 @@ package object doublefreecell extends variationPoints  {
       /** All rules here. */
       moves = Seq(tableauToTableauMove, tableauToFoundationMove, fromTableauToReserve, fromReserveToReserve, fromReserveToTableau, fromReserveToFoundation ),
       // fix winning logic
-      logic = BoardState(Map(Foundation -> 52)),
+      logic = BoardState(Map(Foundation -> 104)),
       customizedSetup = Seq.empty,
 
       solvable = true,

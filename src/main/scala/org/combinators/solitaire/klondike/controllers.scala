@@ -48,6 +48,15 @@ trait controllers extends shared.Controller with shared.Moves with GameTemplate 
       .addCombinator (new SingleCardMoveHandler(fanPile))    // Variation
       .addCombinator (new buildablePilePress.CP2())
 
+    updated = updated
+      .addCombinator (new IgnoreClickedHandler(deck))
+      .addCombinator (new IgnoreReleasedHandler(deck))
+
+    updated = updated
+      .addCombinator (new IgnoreClickedHandler(wastePile))
+      .addCombinator (new IgnoreReleasedHandler(wastePile))
+
+
     // TODO: FIX WITH PROPER MODELING
     // Some variations allow you to reset deck, others don't; note if numRedeals is a positive number, then
     // we can deal with that dynamically via state.

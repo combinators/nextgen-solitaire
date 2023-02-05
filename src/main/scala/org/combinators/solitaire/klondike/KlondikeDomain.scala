@@ -9,7 +9,7 @@ import domain.moves.ResetDeckMove
 import org.combinators.cls.interpreter.combinator
 import org.combinators.cls.types._
 import org.combinators.cls.types.syntax._
-import org.combinators.solitaire.domain.Solitaire
+import org.combinators.solitaire.domain.{Element, Solitaire}
 import org.combinators.templating.twirl.Java
 import org.combinators.solitaire.shared._
 import org.combinators.solitaire.shared.compilation.{CodeGeneratorRegistry, generateHelper}
@@ -19,6 +19,22 @@ import org.combinators.solitaire.shared.compilation.{CodeGeneratorRegistry, gene
   */
 class KlondikeDomain(override val solitaire:Solitaire) extends SolitaireDomain(solitaire) with SemanticTypes
   with GameTemplate with Controller {
+
+
+  // TODO: Should be able to derive this from the modeling
+  override def baseModelNameFromElement (e:Element): String = {
+    e match {
+      case WastePile => "Pile"
+      case _ => super.baseModelNameFromElement(e)
+    }
+  }
+
+  override def baseViewNameFromElement (e:Element): String = {
+    e match {
+      case WastePile => "PileView"
+      case _ => super.baseViewNameFromElement(e)
+    }
+  }
 
   /**
     * Klondike needs ability to have constraint for move.
