@@ -6,8 +6,6 @@ package object bigforty {
 
   case class AllSameSuit(src:MoveInformation) extends Constraint
 
-  case object WastePile extends Element (true)
-
   val numTableau:Int = 10
   val numFoundation:Int = 4
   val map:Map[ContainerType,Seq[Element]] = Map(

@@ -78,8 +78,9 @@ object constraintCodeGenerators extends LazyLogging {
                        |	   source.add(s.get());
                        |  }
                        |}""".stripMargin).statements()
-        case DealDeck(numCards) =>
-              val stmts:Seq[Statement] = Seq.fill(numCards)(Java("s.add (source.get());").statement)
+        case DealDeck(numCards) =>  // Must protect against attempting to deal too many cards
+              val stmts:Seq[Statement] = Seq.fill(numCards)(
+                Java("if (!source.empty()) { s.add (source.get()); }").statement)
 
               Java(s"""|for (Stack s : destinations) {
                        |  ${stmts.mkString("\n")}
@@ -364,6 +365,11 @@ object constraintCodeGenerators extends LazyLogging {
     CodeGeneratorRegistry[Expression, OppositeColor] {
       case (registry: CodeGeneratorRegistry[Expression], OppositeColor(on,other)) =>
         Java(s"${registry(on).get}.oppositeColor(${registry(other).get})").expression()
+    },
+
+    CodeGeneratorRegistry[Expression, SameColor] {
+      case (registry: CodeGeneratorRegistry[Expression], SameColor(on,other)) =>
+        Java(s"${registry(on).get}.sameColor(${registry(other).get})").expression()
     },
 
     CodeGeneratorRegistry[Expression, IsEmpty] {

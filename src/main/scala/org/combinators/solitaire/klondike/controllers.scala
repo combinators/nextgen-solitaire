@@ -1,5 +1,6 @@
 package org.combinators.solitaire.klondike
 
+import com.github.javaparser.ast.body.BodyDeclaration
 import com.github.javaparser.ast.expr.SimpleName
 import com.github.javaparser.ast.stmt.Statement
 import org.combinators.cls.types.syntax._
@@ -11,6 +12,7 @@ import org.combinators.templating.twirl.Java
 import org.combinators.generic
 import org.combinators.solitaire.domain._
 import org.combinators.solitaire.domain.WinningLogic
+import org.combinators.solitaire.shared.compilation.generateHelper
 
 trait controllers extends shared.Controller with shared.Moves with GameTemplate with WinningLogic with generic.JavaCodeIdioms with SemanticTypes  {
 

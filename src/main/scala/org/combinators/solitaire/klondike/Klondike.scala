@@ -24,3 +24,23 @@ trait KlondikeVariationT extends SolitaireSolution {
 object KlondikeMain extends DefaultMain with KlondikeVariationT {
   override lazy val solitaire = klondike
 }
+
+object KlondikeDeal3Main extends DefaultMain with KlondikeVariationT {
+  override lazy val solitaire = klondikeDeal3.klondike
+}
+
+object EastCliffMain extends DefaultMain with KlondikeVariationT {
+  override lazy val solitaire = eastcliff.eastcliff
+}
+
+object SmallHarpMain extends DefaultMain with KlondikeVariationT {
+  override lazy val solitaire = smallharp.smallharp
+}
+
+object WhiteheadMain extends DefaultMain with KlondikeVariationT {
+  override lazy val solitaire = whitehead.whitehead
+}
+
+object ThumbAndPouchMain extends DefaultMain with KlondikeVariationT {
+  override lazy val solitaire = thumbAndPouch.thumbandpouch
+}
