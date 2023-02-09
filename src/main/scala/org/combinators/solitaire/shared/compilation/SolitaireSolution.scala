@@ -49,7 +49,7 @@ trait DefaultMain extends App { self:SolitaireSolution =>
   println(results.targets.collect { case (ty, Some(n)) if n == BigInt(0) => s"&Gamma; &vdash; ? : ${ty.toString}" }.mkString("\n"))
 
   // clean up before generating
-  println("cleaning prior code")
+  println("cleaning prior code:" + priorCode)
   if (priorCode.nonEmpty) {
     FileUtils.deleteDirectory(priorCode.get.relativeTo.toFile)
   }

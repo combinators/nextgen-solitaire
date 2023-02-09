@@ -1,10 +1,8 @@
-package org.combinators.solitaire
+package org.combinators.solitaire.spider
 
 import org.combinators.solitaire.domain._
-import org.combinators.solitaire.spider.variationPoints
 
-
-package object curdsandwhey extends variationPoints {
+package object curdsandwhey extends spiderVariationPoints {
 
   override def numTableau: Int = 13
   override def numFoundation: Int = 4

@@ -1,8 +1,8 @@
 package org.combinators.solitaire.freecell
 
 import org.combinators.cls.interpreter._
-import domain.{Solitaire, SolitaireContainerTypes}
 import org.combinators.solitaire.domain.{Foundation, Tableau}
+import org.combinators.solitaire.freecell.regular.freecell
 import org.combinators.solitaire.shared.SolitaireDomainTest
 import org.scalatest.FunSpec
 

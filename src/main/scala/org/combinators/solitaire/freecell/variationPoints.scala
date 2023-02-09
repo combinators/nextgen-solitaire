@@ -34,7 +34,6 @@ trait variationPoints  {
   val fromTableauToReserve:Move = MultipleCardsMove("TableauToReserve", Drag,
     source=(Tableau,Truth), target=Some((Reserve, AndConstraint(IsSingle(MovingCards), IsEmpty(Destination)))))
 
-  // should be "NotEmpty" not Truth
   val fromReserveToReserve:Move = SingleCardMove("ReserveToReserve", Drag,
     source=(Reserve,Truth), target=Some((Reserve, IsEmpty(Destination))))
 

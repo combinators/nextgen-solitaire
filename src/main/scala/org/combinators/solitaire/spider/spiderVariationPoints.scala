@@ -4,7 +4,7 @@ import org.combinators.solitaire.domain._
 
 /** Defines Spider's variation points
   */
-trait variationPoints {
+trait spiderVariationPoints {
 
   case class AllSameSuit(movingCards: MoveInformation) extends Constraint
   case class AllSameRank(movingCards: MoveInformation) extends Constraint

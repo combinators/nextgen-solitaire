@@ -4,7 +4,7 @@ import org.combinators.solitaire.domain._
 
 /** Additional shared code for spider variations with face-down cards
   */
-trait closedVariationPoints extends variationPoints {
+trait closedSpiderVariationPoints extends spiderVariationPoints {
 
   override def getDeal: Seq[DealStep] = {
     var colNum:Int = 0

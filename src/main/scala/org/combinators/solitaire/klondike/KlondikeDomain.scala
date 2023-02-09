@@ -4,7 +4,6 @@ import com.github.javaparser.ast.ImportDeclaration
 import com.github.javaparser.ast.body.{BodyDeclaration, MethodDeclaration}
 import com.github.javaparser.ast.expr.{Expression, Name, SimpleName}
 import com.github.javaparser.ast.stmt.Statement
-import domain.moves.ResetDeckMove
 import org.combinators.cls.interpreter.combinator
 import org.combinators.cls.types._
 import org.combinators.cls.types.syntax._
@@ -81,10 +80,10 @@ class KlondikeDomain(override val solitaire:Solitaire) extends SolitaireDomain(s
   object limitedDealResets {
     val generators: CodeGeneratorRegistry[Seq[Statement]] = CodeGeneratorRegistry.merge[Seq[Statement]](
 
-      CodeGeneratorRegistry[Seq[Statement], ResetDeckMove] {
+      CodeGeneratorRegistry[Seq[Statement], ResetDeckMoveHelper] {
 
         // retrieve old statements, and just add one more
-        case (registry: CodeGeneratorRegistry[Seq[Statement]], r: ResetDeckMove) =>
+        case (registry: CodeGeneratorRegistry[Seq[Statement]], r: ResetDeckMoveHelper) =>
           val old:Seq[Statement] = constraintCodeGenerators.doGenerators(r).get
 
           old ++ Java(s"""ConstraintHelper.takeRedeal();""").statements()

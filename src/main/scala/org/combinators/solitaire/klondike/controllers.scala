@@ -1,6 +1,5 @@
 package org.combinators.solitaire.klondike
 
-import com.github.javaparser.ast.body.BodyDeclaration
 import com.github.javaparser.ast.expr.SimpleName
 import com.github.javaparser.ast.stmt.Statement
 import org.combinators.cls.types.syntax._
@@ -12,7 +11,6 @@ import org.combinators.templating.twirl.Java
 import org.combinators.generic
 import org.combinators.solitaire.domain._
 import org.combinators.solitaire.domain.WinningLogic
-import org.combinators.solitaire.shared.compilation.generateHelper
 
 trait controllers extends shared.Controller with shared.Moves with GameTemplate with WinningLogic with generic.JavaCodeIdioms with SemanticTypes  {
 
@@ -71,10 +69,6 @@ trait controllers extends shared.Controller with shared.Moves with GameTemplate 
     updated = createWinLogic(updated, s)
 
     // needed for DealByThree variation. Would love to be able to separate these out better.
-
-    //    @combinator object MakeFanPile extends ExtendModel("Column", "FanPile", 'FanPileClass)
-    //    @combinator object MakeWastePile extends ExtendModel("Pile", "WastePile", 'WastePileClass)
-    //    @combinator object MakeWastePileView extends ExtendView("View", "WastePileView", "WastePile", 'WastePileViewClass)
 
     // move these to shared area
     updated = updated
@@ -183,10 +177,6 @@ trait controllers extends shared.Controller with shared.Moves with GameTemplate 
   }
 
   @combinator object ChainTogether extends deckPress.ChainTogether
-
-//  @combinator object MakeWastePile extends ExtendModel("Pile", "WastePile", 'WastePileClass)
-//  @combinator object MakeWastePileView extends ExtendView("View", "WastePileView", "WastePile", 'WastePileViewClass)
-
 }
 
 

@@ -1,11 +1,8 @@
-package org.combinators.solitaire
+package org.combinators.solitaire.spider
 
 import org.combinators.solitaire.domain._
-import org.combinators.solitaire.spider.closedVariationPoints
-import org.combinators.templating.twirl.Java
 
-
-package object baby extends closedVariationPoints {
+package object baby extends closedSpiderVariationPoints {
 
   override def numTableau: Int = 8
   override def numFoundation: Int = 4
