@@ -68,6 +68,11 @@ object constraintCodeGenerators extends LazyLogging {
               Java(s"""|for (Stack s : destinations) {
                        |  removedCards.add(s.get());
                        |}""".stripMargin).statements()
+          case RemoveStack =>
+            Java(
+              s"""|while(!destination.empty()){
+                  |  removedCards.add(destination.get());
+                  |}""".stripMargin).statements()
         case RemoveSingleCard =>
               Java(s"removedCard = source.get();".stripMargin).statements()
         case ResetDeck =>
@@ -118,6 +123,14 @@ object constraintCodeGenerators extends LazyLogging {
                        |  this(null, dests);
                        |}
                        |""".stripMargin).classBodyDeclarations().mkString("\n")
+          case RemoveStack =>
+            val name = move.name
+            Java(
+              s"""|java.util.ArrayList<Card> removedCards = new java.util.ArrayList<Card>();
+                  |public $name(Stack dests) {
+                  |  this(null, dests);
+                  |}
+                  |""".stripMargin).classBodyDeclarations().mkString("\n")
           case RemoveSingleCard =>
               val name = move.name
               Java(s"""|Card removedCard = null;
@@ -167,6 +180,12 @@ object constraintCodeGenerators extends LazyLogging {
                        |  s.add(removedCards.remove(0));
                        |}
                        |return true;""".stripMargin).statements()
+          case RemoveStack =>
+            Java(
+              s"""|while(!removedCards.isEmpty()){
+                  |  destination.add(removedCards.remove(0));
+                  |}
+                  |return true;""".stripMargin).statements()
           case RemoveSingleCard =>
               Java(s"""|source.add(removedCard);
                        |return true;""".stripMargin).statements()

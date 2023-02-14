@@ -37,9 +37,10 @@ package object curdsandwhey extends spiderVariationPoints {
     val isEmpty = IsEmpty(Destination)
     val suit = AllSameSuit(cards)
     val rank = AllSameRank(cards)
+    val single = IsSingle(cards)
     val suitBuild = AndConstraint(NextRank(topDestination, bottomMoving, wrapAround=true), SameSuit(topDestination, bottomMoving))
 
-    val sr_xor = OrConstraint(AndConstraint(suit, NotConstraint(rank)), AndConstraint(NotConstraint(suit), rank))
+    val sr_xor = OrConstraint(AndConstraint(suit, NotConstraint(rank)), AndConstraint(NotConstraint(suit), rank),single)
 
     IfConstraint(isEmpty, IsKing(bottomMoving),
       AndConstraint(sr_xor,
