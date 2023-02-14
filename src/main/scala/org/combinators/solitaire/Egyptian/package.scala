@@ -2,27 +2,31 @@ package org.combinators.solitaire
 
 import org.combinators.solitaire.domain._
 
-package object bigforty {
+package object Egyptian {
 
   case class AllSameSuit(src:MoveInformation) extends Constraint
 
+  case object WastePile extends Element (true)
+
   val numTableau:Int = 10
-  val numFoundation:Int = 4
+  val numFoundation:Int = 8
   val map:Map[ContainerType,Seq[Element]] = Map(
     Tableau -> Seq.fill[Element](numTableau)(Column),
     Foundation -> Seq.fill[Element](numFoundation)(Pile),
     Waste -> Seq.fill[Element](1)(WastePile),
-    StockContainer -> Seq(Stock())
+    StockContainer -> Seq(Stock(2))
   )
 
   val isEmpty = IsEmpty(Destination)
+  val nextOne =  NextRank(TopCardOf(Destination), MovingCard)
 
   val bottomMoving = BottomCardOf(MovingCards)
   val topDestination = TopCardOf(Destination)
 
   //constraint to the destination
-  val and= AndConstraint(NextRank(TopCardOf(Destination), BottomCardOf(MovingCards)),
-                         SameSuit(TopCardOf(Destination), BottomCardOf(MovingCards)))
+  val and= AndConstraint(NextRank(TopCardOf(Destination),
+    BottomCardOf(MovingCards)), OppositeColor(TopCardOf(Destination),
+    BottomCardOf(MovingCards)), AlternatingColors(MovingCards))
   val or = OrConstraint(isEmpty, and)
 
   //constraint to the source
@@ -30,14 +34,15 @@ package object bigforty {
   val and_2 = AndConstraint(descend, AllSameSuit(MovingCards))
 
   val tableauToTableau:Move = MultipleCardsMove ("MoveColumn", Drag,
-    source=(Tableau, Truth),  target=Some((Tableau, or)))
+    source=(Tableau, NotConstraint(IsEmpty(Source))),  target=Some((Tableau, or)))
 
   //2. waste to tableau
-  val moveCard= OrConstraint(isEmpty, NextRank(TopCardOf(Destination), MovingCard))
+  val moveCard= OrConstraint(isEmpty, AndConstraint(NextRank(TopCardOf(Destination), MovingCard),OppositeColor(MovingCard, TopCardOf(Destination))))
   val wasteToTableau:Move = SingleCardMove("MoveCard", Drag,
-    source=(Waste, Truth), target=Some(Tableau, moveCard))
+    source=(Waste,Truth), target=Some(Tableau, moveCard))
 
   //3. waste to foundation  4.tableau to foundation
+  val isSingle = IsSingle(MovingCards)
   val tf_tgt = IfConstraint(isEmpty,
     AndConstraint (IsSingle(MovingCards), IsAce(BottomCardOf(MovingCards))),
     AndConstraint (IsSingle(MovingCards),
@@ -63,9 +68,28 @@ package object bigforty {
   // this creates DeckToPile, as in the above DeckDealMove.
   val deckReset:Move =  ResetDeckMove("ResetDeck", source=(StockContainer, IsEmpty(Source)), target=Some(Waste,Truth))
 
-  val bigforty:Solitaire = {
+  def getDeal: Seq[DealStep] = {
+    val colNum = 0;
+    var dealSeq: Seq[DealStep] = Seq()
+    var cardNum = 1;
+    for (colNum <- 0 to 4) {
+      dealSeq = dealSeq :+ DealStep(ElementTarget(Tableau, colNum), Payload(numCards = cardNum))
+      cardNum = cardNum + 2
+    }
+    cardNum = 10
+    for (colNum <- 5 to 9) {
+      dealSeq = dealSeq :+ DealStep(ElementTarget(Tableau, colNum), Payload(numCards = cardNum))
+      cardNum = cardNum - 2
+    }
 
-    Solitaire( name="Bigforty",
+    dealSeq
+
+  }
+
+
+  val egyptian:Solitaire = {
+
+    Solitaire( name="Egyptian",
       structure = map,
 
       layout = Layout(Map(
@@ -75,18 +99,16 @@ package object bigforty {
         Waste -> horizontalPlacement(95, 20, 1, card_height)
       )),
 
-      deal = Seq(DealStep(ContainerTarget(Tableau), Payload(faceUp=true, 4)),
-        DealStep(ContainerTarget(Waste))
-      ),
+      deal = getDeal,
 
       /** from element can infer ks.ViewWidget as well as Base Element. */
       specializedElements = Seq(WastePile),
 
-      /** All rules here. */
+      /** All rules here. ,*/
       moves = Seq(tableauToTableau,wasteToTableau,buildFoundation,buildFoundationFromWaste,deckDeal,deckReset),
 
       // fix winning logic
-      logic = BoardState(Map(Foundation -> 52))
+      logic = BoardState(Map(Foundation -> 104))
     )
   }
 }
