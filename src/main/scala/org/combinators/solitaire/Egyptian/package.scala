@@ -34,7 +34,8 @@ package object Egyptian {
   val and_2 = AndConstraint(descend, AllSameSuit(MovingCards))
 
   val tableauToTableau:Move = MultipleCardsMove ("MoveColumn", Drag,
-    source=(Tableau, NotConstraint(IsEmpty(Source))),  target=Some((Tableau, or)))
+    // NotConstraint(IsEmpty(Source))
+    source=(Tableau, Truth),  target=Some((Tableau, or)))
 
   //2. waste to tableau
   val moveCard= OrConstraint(isEmpty, AndConstraint(NextRank(TopCardOf(Destination), MovingCard),OppositeColor(MovingCard, TopCardOf(Destination))))
@@ -50,7 +51,8 @@ package object Egyptian {
       SameSuit(BottomCardOf(MovingCards), TopCardOf(Destination))))
 
   val buildFoundation:Move = MultipleCardsMove("BuildFoundation", Drag,
-    source=(Tableau, NotConstraint(IsEmpty(Source))), target=Some((Foundation, tf_tgt)))
+    // NotConstraint(IsEmpty(Source))
+    source=(Tableau, Truth), target=Some((Foundation, tf_tgt)))
 
   val wf_tgt =  IfConstraint(isEmpty,
      AndConstraint ( IsSingle(MovingCard), IsAce(MovingCard)),
