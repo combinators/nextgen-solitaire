@@ -67,6 +67,7 @@ class FreeCellDomain(override val solitaire:Solitaire) extends SolitaireDomain(s
 
         Python(s"""
                   |def sufficientFree (destination, source):
+                  |    # Still needs to be worked on....
                   |    return True
                   |
                   |""".stripMargin)
