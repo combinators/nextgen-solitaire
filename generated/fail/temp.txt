@@ -1,0 +1,1 @@
+This folder will contain all variations that Fail one or more Junit tests

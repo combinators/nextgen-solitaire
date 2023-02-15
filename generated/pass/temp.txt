@@ -1,0 +1,1 @@
+This folder will contain all variations that Pass all Junit tests
