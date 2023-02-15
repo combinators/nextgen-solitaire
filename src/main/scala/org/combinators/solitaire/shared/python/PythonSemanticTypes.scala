@@ -39,5 +39,7 @@ trait PythonSemanticTypes extends SemanticTypes {
     val minimal:Int = 99999
     val simplesimon:Int = 99006
     val golf:Int = 99008
+    val bakersDozen:Int = 99009
+    val spanishPatience:Int = 99010
   }
 }
