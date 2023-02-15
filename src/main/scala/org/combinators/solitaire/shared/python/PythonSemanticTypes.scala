@@ -37,5 +37,6 @@ trait PythonSemanticTypes extends SemanticTypes {
     val freecell:Int = 99004
     val fan:Int = 99005
     val minimal:Int = 99999
+    val simplesimon:Int = 99006
   }
 }
