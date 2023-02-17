@@ -41,5 +41,6 @@ trait PythonSemanticTypes extends SemanticTypes {
     val golf:Int = 99008
     val bakersDozen:Int = 99009
     val spanishPatience:Int = 99010
+    val castlesInSpain:Int = 99011
   }
 }
