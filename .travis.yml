@@ -1,8 +1,33 @@
+services:
+  - xvfb
+before_script:
+  - export DISPLAY=:99.0
+env:
+  global:
+    - GENERATE="runMain org.combinators.solitaire"
 matrix:
-   include:
-       - language: scala
-         jdk: openjdk8
-         script:
-         - sbt compile
-         - sbt run
-         - sbt runMain buildTest.TestSynthesisConvert
+  include:
+    - language: scala
+      jdk: openjdk8
+      script:
+        - sbt compile
+        - pwd
+        - ls
+        - while read i; do
+          i=$(echo "$i" | tr -d '\n');
+          remover="org/combinators/solitaire/";
+          i_without=${i#$remover};
+          i_cleaned=${i_without%\$*};
+          variant=${i_cleaned////.};
+          echo $variant;
+          sbt "$GENERATE.$variant";
+          mv -f generated/src/main/java/org/combinators/solitaire/* src/test/java/org/combinators/solitaire/;
+          if sbt test; then
+          mv src/test/java/org/combinators/solitaire/* generated/yes; else
+          mv src/test/java/org/combinators/solitaire/* generated/no;
+          fi;
+          done < travis.txt
+        - cd ../../../generated/yes
+        - ls
+        - cd ../no
+        - ls

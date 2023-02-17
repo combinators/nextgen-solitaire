@@ -2,8 +2,6 @@ package org.combinators.solitaire.bigforty
 
 import com.github.javaparser.ast.CompilationUnit
 import org.combinators.cls.interpreter._
-import domain.bigforty.Domain
-import domain.{Solitaire, SolitaireContainerTypes}
 import org.combinators.TypeNameStatistics
 import org.combinators.solitaire.domain.{Foundation, StockContainer, Tableau, Waste}
 import org.combinators.solitaire.shared.SolitaireDomainTest

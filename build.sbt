@@ -48,7 +48,8 @@ lazy val root = (Project(id = "nextgen-solitaire", base = file(".")))
 
     sourceDirectories in (Compile, TwirlKeys.compileTemplates) := Seq(
       sourceDirectory.value / "main" / "java-templates",
-      sourceDirectory.value / "main" / "python-templates"
+      sourceDirectory.value / "main" / "python-templates",
+      baseDirectory.value / "generated" / "src" / "main" / "java"
     ),
     TwirlKeys.templateFormats += ("java" -> "org.combinators.templating.twirl.JavaFormat"),
     TwirlKeys.templateFormats += ("py" -> "org.combinators.templating.twirl.PythonFormat"),
@@ -62,7 +63,9 @@ lazy val root = (Project(id = "nextgen-solitaire", base = file(".")))
     TwirlKeys.templateImports += "com.github.javaparser.ast.stmt._",
     TwirlKeys.templateImports += "com.github.javaparser.ast.`type`._",
 
-    PlayKeys.playMonitoredFiles ++= (sourceDirectories in (Compile, TwirlKeys.compileTemplates)).value
+    PlayKeys.playMonitoredFiles ++= (sourceDirectories in (Compile, TwirlKeys.compileTemplates)).value,
+
+    unmanagedJars in Compile += file("demo/standAlone.jar")
   )
 
 libraryDependencies += "junit" % "junit" % "4.13.2"
