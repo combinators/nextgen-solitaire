@@ -2,6 +2,7 @@ services:
   - xvfb
 before_script:
   - export DISPLAY=:99.0
+  - git fetch --unshallow
 env:
   global:
     - GENERATE="runMain org.combinators.solitaire"
@@ -11,14 +12,12 @@ matrix:
       jdk: openjdk8
       script:
         - sbt compile
+        - rm -r Invalid/*
+        - rm -r Valid/*
         - pwd
         - ls
         - while read i; do
-          i=$(echo "$i" | tr -d '\n');
-          remover="org/combinators/solitaire/";
-          i_without=${i#$remover};
-          i_cleaned=${i_without%\$*};
-          variant=${i_cleaned////.};
+          variant=$(echo "$i" | tr -d '\n');
           echo $variant;
           sbt "$GENERATE.$variant";
           mv -f generated/src/main/java/org/combinators/solitaire/* src/test/java/org/combinators/solitaire/;
@@ -27,7 +26,12 @@ matrix:
           mv src/test/java/org/combinators/solitaire/* Invalid;
           fi;
           done < travis.txt
+        - git config --global user.email "gilchristb78@gmail.com";
+        - git config --global user.name "gilchristb78";
+        - git add Valid/ Invalid/;
+        - git commit -m"Travis Tests Results";
+        - git push --force "https://${GH_TOKEN}@github.com/gilchristb78/Valid" HEAD:main;
         - cd Valid
         - ls
-        - cd Invalid
+        - cd ../Invalid
         - ls
