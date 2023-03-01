@@ -38,6 +38,27 @@ trait variationPoints {
     deal
   }
 
+  def somersetDeal: Seq[DealStep] = {
+    var deal: Seq[DealStep] = Seq()
+
+    // each of the BuildablePiles gets a number of facedown cards, 0 to first Pile, 1 to second pile, etc...
+    // don't forget zero-based indexing.
+    for (pileNum <- 1 until 8) {
+      deal = deal :+ DealStep(ElementTarget(Tableau, pileNum), new Payload(true, pileNum))
+    }
+    for (pileNum <- 8 until 10) {
+      deal = deal :+ DealStep(ElementTarget(Tableau, pileNum), new Payload(true, 7))
+    }
+
+    // finally each one gets a single faceup Card, and deal one to waste pile
+    //add(new DealStep(new ContainerTarget(SolitaireContainerTypes.Tableau), new Payload()));
+    deal = deal :+ DealStep(ContainerTarget(Tableau))
+
+    // finally to deal cards
+   // deal = deal :+ DealStep(ContainerTarget(Waste), Payload(true, numToDeal))
+    deal
+  }
+
 
   // Klondike consists of following actionable elements
   //

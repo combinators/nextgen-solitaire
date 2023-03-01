@@ -44,3 +44,7 @@ object WhiteheadMain extends DefaultMain with KlondikeVariationT {
 object ThumbAndPouchMain extends DefaultMain with KlondikeVariationT {
   override lazy val solitaire = thumbAndPouch.thumbandpouch
 }
+
+object Somerset extends DefaultMain with KlondikeVariationT {
+  override lazy val solitaire = somerset.somerset
+}
