@@ -1,5 +1,6 @@
 package org.combinators.discord.hello
 
+import com.sun.xml.internal.ws.addressing.v200408.WsaTubeHelperImpl
 import org.combinators.cls.interpreter.ReflectedRepository
 import org.combinators.discord.domain._
 import org.combinators.discord.shared.DiscordDomain
@@ -23,6 +24,7 @@ trait controllers extends DiscordTemplate  with SemanticTypes  {
       updated = updated.addCombinator(new CommContent(discord.commContent))
       updated = updated.addCombinator(new EventNames(discord.eventNames))
       updated = updated.addCombinator(new EventContents(discord.eventContents))
+      updated = updated.addCombinator(new Helpers(discord.helpers))
       updated
     }
 }

@@ -10,7 +10,9 @@ case class Discord (
    commArgs:Array[String],
    commContent: Array[String],
    eventNames: Array[String],
-   eventContents: Array[String]
+   eventContents: Array[String],
+   helpers:Array[String]
+
 
 
 

@@ -35,6 +35,7 @@ trait SemanticTypes {
     val eventContents: Type = 'EventContents
     val fileName:Type = 'FileName
     val structure:Type = 'Structure
+    val helpers:Type = 'Helpers
 
     val initFile:Type = 'InitFile
   }

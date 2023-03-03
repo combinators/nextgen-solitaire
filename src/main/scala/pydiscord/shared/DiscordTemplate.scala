@@ -55,6 +55,12 @@ trait DiscordTemplate extends Base with SemanticTypes {
     }
     val semanticType:Type = bot(bot.eventContents)
   }
+  class Helpers(arr:Array[String]){
+    def  apply(): Array[String] = {
+      arr
+    }
+    val semanticType:Type = bot(bot.helpers)
+  }
   // instantiate THIS
   class Description(str:String) {
     def apply() : String = {
@@ -101,6 +107,16 @@ trait DiscordTemplate extends Base with SemanticTypes {
           case "on_user_update" => eventCode += "@bot.event\nasync def on_user_update(before, after):\n    " + cont+ "\n"
           case "on_member_update" => eventCode += "@bot.event\nasync def on_member_update(before, after):\n    " + cont+ "\n"
           case "on_bulk_message_delete" => eventCode += "@bot.event\nasync def on_bulk_message_delete(messages):\n    " + cont+ "\n"
+          case "on_guild_channel_delete" => eventCode += "@bot.event\nasync def on_guild_channel_delete(channel):\n    " + cont+ "\n"
+          case "on_guild_channel_create" => eventCode += "@bot.event\nasync def on_guild_channel_create(channel):\n    " + cont+ "\n"
+          case "on_guild_channel_update" => eventCode += "@bot.event\nasync def on_guild_channel_update(before, after):\n    " + cont+"\n"
+          case "on_invite_create" => eventCode += "@bot.event\nasync def on_invite_create(invite):\n    " + cont + "\n"
+          case "on_invite_delete" => eventCode += "@bot.event\nasync def on_invite_delete(invite):\n    " + cont + "\n"
+          case "on_member_ban" => eventCode += "@bot.event\nasync def on_member_ban(guild, user):\n    " + cont + "\n"
+          case "on_member_unban" => eventCode += "@bot.event\nasync def on_member_unban(guild, user):\n    " + cont + "\n"
+          case "on_guild_role_create" => eventCode += "@bot.event\nasync def on_guild_role_create(role):\n    " + cont + "\n"
+          case "on_guild_role_delete" => eventCode += "@bot.event\nasync def on_guild_role_delete(role):\n    " + cont + "\n"
+          case "on_guild_role_update" => eventCode += "@bot.event\nasync def on_guild_role_update(before, after):\n    " + cont+"\n"
           case _ => println("invalid event name!")
         }
       }
@@ -113,9 +129,17 @@ trait DiscordTemplate extends Base with SemanticTypes {
       }
       commCode
     }
-    def apply(fileName:String, libraries:String, description:String, prefix:String, commName: Array[String], commArgs: Array[String], commContent: Array[String], eventNames: Array[String], eventContents: Array[String]): PythonWithPath = {
+    def genHelpers(strings: Array[String]): String ={
+      var helperCode = ""
+      for (i <- 0 to (strings.length-1)){
+        helperCode += strings(i)
+      }
+      helperCode
+    }
+    def apply(fileName:String, libraries:String, description:String, prefix:String, commName: Array[String], commArgs: Array[String], commContent: Array[String], eventNames: Array[String], eventContents: Array[String], helpers: Array[String]): PythonWithPath = {
       val eventCode = genEvent(eventNames, eventContents)
       val commCode = genCommand(commName,commArgs ,commContent)
+      val helperCode = genHelpers(helpers)
       val code =
         Python(s"""|$libraries
                    |
@@ -132,20 +156,19 @@ trait DiscordTemplate extends Base with SemanticTypes {
                    |
                    |# something would generate this
                    |bot = commands.Bot(command_prefix='$prefix', description=description, intents=intents)
+                   |# Events
                    |$eventCode
+                   |# Commands
                    |$commCode
                    |
-                   |
-                   |@bot.command()
-                   |async def hello(ctx):
-                   |    await ctx.send('Hello!')
-                   |
+                   |#helper functions
+                   | $helperCode
                    |# Now run...
                    |bot.run()
                    |
                    |""".stripMargin)
       PythonWithPath(code, Paths.get(fileName + ".py"))
     }
-    val semanticType:Type = bot(bot.fileName) =>: bot(bot.libraries) =>: bot(bot.description) =>: bot(bot.prefix) =>: bot(bot.commName) =>: bot(bot.commArgs) =>: bot(bot.commContent) =>: bot(bot.eventNames) =>: bot(bot.eventContents) =>: bot(complete)
+    val semanticType:Type = bot(bot.fileName) =>: bot(bot.libraries) =>: bot(bot.description) =>: bot(bot.prefix) =>: bot(bot.commName) =>: bot(bot.commArgs) =>: bot(bot.commContent) =>: bot(bot.eventNames) =>: bot(bot.eventContents) =>: bot(bot.helpers) =>: bot(complete)
   }
 }
