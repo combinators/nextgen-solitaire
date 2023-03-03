@@ -19,9 +19,15 @@ trait CastleT extends SolitaireSolution {
 
   lazy val results: Results =
     EmptyInhabitationBatchJobResults(Gamma).addJobs[CompilationUnit](targets).compute()
-
+  override lazy val routingPrefix:Option[String] = Some("castle")
 }
 
 object CastleMain extends CastleT with DefaultMain {
   lazy val solitaire = castle
+}
+object StreetsAndAlleysMain extends DefaultMain with CastleT {
+  lazy val solitaire = org.combinators.solitaire.castle.streets_and_alleys.definition
+}
+object PenelopesWebMain extends DefaultMain with CastleT {
+  lazy val solitaire = org.combinators.solitaire.castle.penelopes_web.definition
 }
